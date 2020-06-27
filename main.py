@@ -5,7 +5,7 @@ Main file of the FastAPI application, routes live here.
 from typing import List
 from fastapi import FastAPI
 import control
-from models import User
+from models import User, WatchlistInfo
 
 
 APP = FastAPI()
@@ -41,3 +41,11 @@ async def get_watchlists():
     Get a list of watchlists in the watchlist directory.
     '''
     return control.get_watchlists()
+
+
+@APP.get("/watchlists/{watchlist_name}", response_model=WatchlistInfo)
+async def get_watchlist(watchlist_name: str):
+    '''
+    Get top level details of a watchlist.
+    '''
+    return control.get_watchlist(watchlist_name)

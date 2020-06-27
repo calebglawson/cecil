@@ -42,3 +42,12 @@ class User(BaseModel):
     class Config:
         '''Accept SQLAlchemy objects.'''
         orm_mode = True
+
+
+class WatchlistInfo(BaseModel):
+    '''
+    Top level info about a watchlist.
+    '''
+    name: str
+    watchlist_count: int
+    watchword_count: int
