@@ -39,3 +39,14 @@ def get_watchlist(watchlist_id):
         'watchlist_count': wl.get_watchlist_count(),
         'watchword_count': wl.get_watchwords_count()
     }
+
+
+def get_watchlist_users(watchlist_id):
+    wl = Watchlist(watchlist_id)
+    wl.refresh_watchlist_user_data()
+    return wl.get_watchlist_users()
+
+
+def add_watchlist(watchlist_id, user_id):
+    wl = Watchlist(watchlist_id)
+    wl.add_watchlist(user_id)

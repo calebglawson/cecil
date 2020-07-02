@@ -49,3 +49,19 @@ async def get_watchlist(watchlist_name: str):
     Get top level details of a watchlist.
     '''
     return control.get_watchlist(watchlist_name)
+
+
+@APP.get("/watchlists/{watchlist_name}/users/", response_model=List[User])
+async def get_watchlist_users(watchlist_name: str):
+    '''
+    Get users on the watchlist.
+    '''
+    return control.get_watchlist_users(watchlist_name)
+
+
+@APP.post("/watchlists/{watchlist_name}/users/{user_id}")
+async def add_watchlist_users(watchlist_name: str, user_id: int):
+    '''
+    Add user to the watchlist.
+    '''
+    return control.add_watchlist(watchlist_name, user_id)
