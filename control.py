@@ -6,8 +6,25 @@ from pathlib import Path
 from baquet.user import Directory, User
 from baquet.watchlist import Watchlist
 
-
 _WL_PATH = Path("./watchlists")
+
+
+def _exists(directoryname, filename):
+    '''
+    Test existance of a file.
+    '''
+    if not Path(f"./{directoryname}/{filename}.db").exists():
+        raise FileNotFoundError
+
+
+def _wl_helper(watchlist_id):
+    _exists("watchlists", watchlist_id)
+    return Watchlist(watchlist_id)
+
+
+def _user_helper(user_id):
+    _exists("users", user_id)
+    return User(user_id)
 
 
 def get_users(page, page_size):
@@ -21,7 +38,15 @@ def get_user(user_id):
     '''
     Get a user's top level info.
     '''
-    return User(user_id).get_user()
+    user = _user_helper(user_id)
+    return user.get_user()
+
+
+def add_user(user_id):
+    '''
+    Add a user.
+    '''
+    User(user_id)
 
 
 def get_watchlists():
@@ -32,21 +57,46 @@ def get_watchlists():
 
 
 def get_watchlist(watchlist_id):
-    wl = Watchlist(watchlist_id)
+    '''
+    Get top level info about a watchlist.
+    '''
+    watchlist = _wl_helper(watchlist_id)
 
     return {
         'name': watchlist_id,
-        'watchlist_count': wl.get_watchlist_count(),
-        'watchword_count': wl.get_watchwords_count()
+        'watchlist_count': watchlist.get_watchlist_count(),
+        'watchword_count': watchlist.get_watchwords_count()
     }
 
 
 def get_watchlist_users(watchlist_id):
-    wl = Watchlist(watchlist_id)
-    wl.refresh_watchlist_user_data()
-    return wl.get_watchlist_users()
+    '''
+    Get a list of users on the watchlist.
+    '''
+    watchlist = _wl_helper(watchlist_id)
+    watchlist.refresh_watchlist_user_data()
+    return watchlist.get_watchlist_users()
 
 
 def add_watchlist(watchlist_id, user_id):
-    wl = Watchlist(watchlist_id)
-    wl.add_watchlist(user_id)
+    '''
+    Add a user to the watchlist.
+    '''
+    watchlist = _wl_helper(watchlist_id)
+    watchlist.add_watchlist(user_id)
+
+
+def get_watchwords(watchlist_id):
+    '''
+    Get the watchwords on the watchlist.
+    '''
+    watchlist = _wl_helper(watchlist_id)
+    return watchlist.get_watchwords()
+
+
+def add_watchword(watchlist_id, watchword):
+    '''
+    Add a search term to the watchlist.
+    '''
+    watchlist = _wl_helper(watchlist_id)
+    watchlist.add_watchword(watchword.word)

@@ -51,3 +51,17 @@ class WatchlistInfo(BaseModel):
     name: str
     watchlist_count: int
     watchword_count: int
+
+
+class AddWatchword(BaseModel):
+    '''
+    Add a single search term to the watchlist.
+    '''
+    word: str
+
+
+class AddUser(BaseModel):
+    '''
+    Add a single user.
+    '''
+    user_id: int
