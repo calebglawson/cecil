@@ -1,9 +1,25 @@
 '''
 Pydantic models for requests and responses.
 '''
-
+from typing import List
 from datetime import datetime
 from pydantic import BaseModel
+
+
+class Paginate(BaseModel):
+    '''
+    Base class for methods returning sqlalchemy paginate objects.
+    '''
+    has_next: bool
+    has_previous: bool
+    next_page: int = None
+    pages: int
+    previous_page: int = None
+    total: int
+
+    class Config:
+        '''Accept SQLAlchemy objects.'''
+        orm_mode = True
 
 
 class User(BaseModel):
@@ -42,6 +58,52 @@ class User(BaseModel):
     class Config:
         '''Accept SQLAlchemy objects.'''
         orm_mode = True
+
+
+class PaginateUser(Paginate):
+    '''
+    User paginator.
+    '''
+    users: List[User]
+
+
+class BaseTweet(BaseModel):
+    '''
+    Base twitter post.
+    '''
+    created_at: datetime
+    entities: str = None
+    favorite_count: int
+    tweet_id: int
+    is_quote_status: bool
+    lang: str
+    possibly_sensitive: bool
+    retweet_count: int
+    source: str
+    source_url: str
+    text: str
+    user_id: int
+    screen_name: str
+    name: str
+    last_updated: datetime
+
+    class Config:
+        '''Accept SQLAlchemy objects.'''
+        orm_mode = True
+
+
+class Favorite(BaseTweet):
+    '''
+    A favorite is essentiallty a BaseTweet.
+    '''
+    pass  # pylint: disable=unnecessary-pass
+
+
+class PaginateFavorites(Paginate):
+    '''
+    Favorite paginator.
+    '''
+    favorites: List[Favorite]
 
 
 class WatchlistInfo(BaseModel):

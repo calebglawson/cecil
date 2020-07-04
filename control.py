@@ -13,6 +13,7 @@ def _exists(directoryname, filename):
     '''
     Test existance of a file.
     '''
+
     if not Path(f"./{directoryname}/{filename}.db").exists():
         raise FileNotFoundError
 
@@ -31,7 +32,7 @@ def get_users(page, page_size):
     '''
     Get a list of users and top level info, paginated.
     '''
-    return Directory().get(page=page, page_size=page_size).items
+    return Directory().get(page=page, page_size=page_size)
 
 
 def get_user(user_id):
@@ -40,6 +41,18 @@ def get_user(user_id):
     '''
     user = _user_helper(user_id)
     return user.get_user()
+
+
+def get_favorites(user_id, page, page_size, watchlist_id, watchwords_id):
+    '''
+    Get a user's favorites.
+    '''
+    user = _user_helper(user_id)
+    if watchlist_id:
+        watchlist_id = _wl_helper(watchlist_id)
+    if watchwords_id:
+        watchwords_id = _wl_helper(watchwords_id)
+    return user.get_favorites(page, page_size, watchlist=watchlist_id, watchwords=watchwords_id)
 
 
 def add_user(user_id):
