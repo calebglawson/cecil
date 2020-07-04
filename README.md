@@ -4,6 +4,6 @@ An API that makes analyzing Twitter user relationships easier for humans. Relies
 ## Quick Start
 Download and set up dependency, `baquet`. You will need Twitter API keys.
 
-Run `uvicorn main:CECIL`
+Run `uvicorn go:CECIL`
 
 Swagger docs at `http://localhost:8000/docs`
