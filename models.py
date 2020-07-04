@@ -31,7 +31,7 @@ class User(BaseModel):
     default_profile: bool = False
     default_profile_image: bool = False
     description: str = None
-    entities: str = None
+    entities: dict = None
     favorites_count: int = None
     followers_count: int = None
     friends_count: int = None
@@ -64,7 +64,7 @@ class PaginateUser(Paginate):
     '''
     User paginator.
     '''
-    users: List[User]
+    items: List[User]
 
 
 class BaseTweet(BaseModel):
@@ -72,7 +72,7 @@ class BaseTweet(BaseModel):
     Base twitter post.
     '''
     created_at: datetime
-    entities: str = None
+    entities: dict = None
     favorite_count: int
     tweet_id: int
     is_quote_status: bool
@@ -103,7 +103,23 @@ class PaginateFavorites(Paginate):
     '''
     Favorite paginator.
     '''
-    favorites: List[Favorite]
+    items: List[Favorite]
+
+
+class TimelineTweet(BaseTweet):
+    '''
+    Timelines can have retweets.
+    '''
+    retweet_user_id: int = None
+    retweet_screen_name: str = None
+    retweet_name: str = None
+
+
+class PaginateTimeline(Paginate):
+    '''
+    Timeline paginator.
+    '''
+    items: List[TimelineTweet]
 
 
 class WatchlistInfo(BaseModel):
