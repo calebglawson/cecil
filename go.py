@@ -55,7 +55,7 @@ async def get_favorites(
 
 
 @CECIL.get("/users/{user_id}/timeline/", response_model=models.PaginateTimeline)
-async def get_favorites(
+async def get_timeline(
         user_id: int,
         page: int = 1,
         page_size: int = 20,
@@ -68,6 +68,48 @@ async def get_favorites(
     try:
         response = control.get_timeline(
             user_id, page, page_size, watchlist_id, watchwords_id)
+    except FileNotFoundError:
+        raise HTTPException(
+            status_code=404, detail=f'User, {user_id}, does not exist.')
+
+    return response
+
+
+@CECIL.get("/users/{user_id}/followers/", response_model=models.PaginateFriendsOrFollowing)
+async def get_followers(
+        user_id: int,
+        page: int = 1,
+        page_size: int = 1500,
+        watchlist_id: str = None
+):
+    '''
+    Get a user's followers.
+    '''
+    try:
+        response = control.get_followers(
+            user_id, page, page_size, watchlist_id
+        )
+    except FileNotFoundError:
+        raise HTTPException(
+            status_code=404, detail=f'User, {user_id}, does not exist.')
+
+    return response
+
+
+@CECIL.get("/users/{user_id}/friends/", response_model=models.PaginateFriendsOrFollowing)
+async def get_friends(
+        user_id: int,
+        page: int = 1,
+        page_size: int = 1500,
+        watchlist_id: str = None
+):
+    '''
+    Get a user's friends.
+    '''
+    try:
+        response = control.get_friends(
+            user_id, page, page_size, watchlist_id
+        )
     except FileNotFoundError:
         raise HTTPException(
             status_code=404, detail=f'User, {user_id}, does not exist.')
