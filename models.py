@@ -122,6 +122,22 @@ class PaginateTimeline(Paginate):
     items: List[TimelineTweet]
 
 
+class FriendsOrFollowing(BaseModel):
+    user_id: int
+    user: User = None
+
+    class Config:
+        '''Accept SQLAlchemy objects.'''
+        orm_mode = True
+
+
+class PaginateFriendsOrFollowing(Paginate):
+    '''
+    Show a list of followers or friends.
+    '''
+    items: List[FriendsOrFollowing]
+
+
 class WatchlistInfo(BaseModel):
     '''
     Top level info about a watchlist.
