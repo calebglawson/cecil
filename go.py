@@ -54,6 +54,27 @@ async def get_favorites(
     return response
 
 
+@CECIL.get("/users/{user_id}/timeline/", response_model=models.PaginateTimeline)
+async def get_favorites(
+        user_id: int,
+        page: int = 1,
+        page_size: int = 20,
+        watchlist_id: str = None,
+        watchwords_id: str = None
+):
+    '''
+    Get a user's timeline.
+    '''
+    try:
+        response = control.get_timeline(
+            user_id, page, page_size, watchlist_id, watchwords_id)
+    except FileNotFoundError:
+        raise HTTPException(
+            status_code=404, detail=f'User, {user_id}, does not exist.')
+
+    return response
+
+
 @CECIL.post("/users/")
 async def add_user(user: models.AddUser):
     '''

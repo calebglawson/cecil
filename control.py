@@ -72,6 +72,22 @@ def get_favorites(user_id, page, page_size, watchlist_id, watchwords_id):
     )
 
 
+def get_timeline(user_id, page, page_size, watchlist_id, watchwords_id):
+    '''
+    Get a user's timeline.
+    '''
+    user = _user_helper(user_id)
+    if watchlist_id:
+        watchlist_id = _wl_helper(watchlist_id)
+    if watchwords_id:
+        watchwords_id = _wl_helper(watchwords_id)
+    return _serialize_paginated_entities(
+        user.get_timeline(
+            page, page_size, watchlist=watchlist_id, watchwords=watchwords_id
+        )
+    )
+
+
 def add_user(user_id):
     '''
     Add a user.
