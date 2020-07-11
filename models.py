@@ -60,6 +60,15 @@ class User(BaseModel):
         orm_mode = True
 
 
+class UserStats(BaseModel):
+    followers_watchlist_percent: float
+    followers_watchlist_completion: float
+    friends_watchlist_percent: float
+    friends_watchlist_completion: float
+    favorite_watchlist_percent: float
+    retweet_watchlist_percent: float
+
+
 class PaginateUser(Paginate):
     '''
     User paginator.
