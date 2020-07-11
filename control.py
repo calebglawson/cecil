@@ -29,23 +29,11 @@ def _user_helper(user_id):
     return User(user_id)
 
 
-def _serialize_entities(item):
-    if hasattr(item, "entities") and item.entities:
-        item.entities = json.loads(item.entities)
-    return item
-
-
-def _serialize_paginated_entities(page):
-    for item in page.items:
-        item = _serialize_entities(item)
-    return page
-
-
 def get_users(page, page_size):
     '''
     Get a list of users and top level info, paginated.
     '''
-    return _serialize_paginated_entities(Directory().get(page=page, page_size=page_size))
+    return Directory().get(page=page, page_size=page_size)
 
 
 def get_user(user_id):
@@ -53,7 +41,7 @@ def get_user(user_id):
     Get a user's top level info.
     '''
     user = _user_helper(user_id)
-    return _serialize_entities(user.get_user())
+    return user.get_user()
 
 
 def get_favorites(user_id, page, page_size, watchlist_id, watchwords_id):
@@ -65,10 +53,8 @@ def get_favorites(user_id, page, page_size, watchlist_id, watchwords_id):
         watchlist_id = _wl_helper(watchlist_id)
     if watchwords_id:
         watchwords_id = _wl_helper(watchwords_id)
-    return _serialize_paginated_entities(
-        user.get_favorites(
-            page, page_size, watchlist=watchlist_id, watchwords=watchwords_id
-        )
+    return user.get_favorites(
+        page, page_size, watchlist=watchlist_id, watchwords=watchwords_id
     )
 
 
@@ -81,10 +67,8 @@ def get_timeline(user_id, page, page_size, watchlist_id, watchwords_id):
         watchlist_id = _wl_helper(watchlist_id)
     if watchwords_id:
         watchwords_id = _wl_helper(watchwords_id)
-    return _serialize_paginated_entities(
-        user.get_timeline(
-            page, page_size, watchlist=watchlist_id, watchwords=watchwords_id
-        )
+    return user.get_timeline(
+        page, page_size, watchlist=watchlist_id, watchwords=watchwords_id
     )
 
 
@@ -210,10 +194,7 @@ def get_watchlist_users(watchlist_id):
     watchlist = _wl_helper(watchlist_id)
     watchlist.refresh_watchlist_user_data()
 
-    results = watchlist.get_watchlist_users()
-    for result in results:
-        result = _serialize_entities(result)
-    return results
+    return watchlist.get_watchlist_users()
 
 
 def add_watchlist(watchlist_id, user_id):
