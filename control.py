@@ -160,6 +160,22 @@ def get_friends(user_id, page, page_size, watchlist_id):
     return results
 
 
+def get_stats(user_id, watchlist_id):
+    '''
+    Get a user's stats.
+    '''
+    user = _user_helper(user_id)
+    wl = _wl_helper(watchlist_id)
+    return {
+        'followers_watchlist_percent': user.get_followers_watchlist_percent(watchlist=wl),
+        'followers_watchlist_completion': user.get_followers_watchlist_completion(watchlist=wl),
+        'friends_watchlist_percent': user.get_friends_watchlist_percent(watchlist=wl),
+        'friends_watchlist_completion': user.get_friends_watchlist_completion(watchlist=wl),
+        'favorite_watchlist_percent': user.get_favorite_watchlist_percent(watchlist=wl),
+        'retweet_watchlist_percent': user.get_retweet_watchlist_percent(watchlist=wl)
+    }
+
+
 def add_user(user_id):
     '''
     Add a user.

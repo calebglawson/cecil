@@ -117,6 +117,20 @@ async def get_friends(
     return response
 
 
+@CECIL.get("/users/{user_id}/stats/{watchlist_id}", response_model=models.UserStats)
+async def get_stats(user_id: int, watchlist_id: str):
+    '''
+    Get a user's friends.
+    '''
+    try:
+        response = control.get_stats(user_id, watchlist_id)
+    except FileNotFoundError:
+        raise HTTPException(
+            status_code=404, detail=f'User, {user_id}, does not exist.')
+
+    return response
+
+
 @CECIL.post("/users/")
 async def add_user(user: models.AddUser):
     '''
