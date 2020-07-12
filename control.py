@@ -82,30 +82,8 @@ def get_followers(user_id, page, page_size, watchlist_id):
     if watchlist_id:
         watchlist_id = _wl_helper(watchlist_id)
 
-    results = user.get_followers(
+    return user.get_followers(
         page=page, page_size=page_size, watchlist=watchlist_id)
-
-    if watchlist_id:
-        user_ids = [follower.user_id for follower in results.items]
-        users = hydrate_user_identifiers(user_ids=user_ids)
-        new_items = []
-
-        for item in results.items:
-            new_user = {}
-            for user in users:
-                setattr(user, "user_id", user.id)
-                if item.user_id == user.id:
-                    new_user = user
-            new_items.append(
-                {
-                    "user_id": item.user_id,
-                    "user": new_user
-                }
-            )
-
-        results.items = new_items
-
-    return results
 
 
 def get_friends(user_id, page, page_size, watchlist_id):
@@ -118,30 +96,8 @@ def get_friends(user_id, page, page_size, watchlist_id):
     if watchlist_id:
         watchlist_id = _wl_helper(watchlist_id)
 
-    results = user.get_friends(
+    return user.get_friends(
         page=page, page_size=page_size, watchlist=watchlist_id)
-
-    if watchlist_id:
-        user_ids = [friend.user_id for friend in results.items]
-        users = hydrate_user_identifiers(user_ids=user_ids)
-        new_items = []
-
-        for item in results.items:
-            new_user = {}
-            for user in users:
-                setattr(user, "user_id", user.id)
-                if item.user_id == user.id:
-                    new_user = user
-            new_items.append(
-                {
-                    "user_id": item.user_id,
-                    "user": new_user
-                }
-            )
-
-        results.items = new_items
-
-    return results
 
 
 def get_stats(user_id, watchlist_id):
