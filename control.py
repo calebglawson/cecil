@@ -122,7 +122,7 @@ def add_user(user_id):
     '''
     Add a user.
     '''
-    User(user_id)
+    User(user_id).get_user()
 
 
 def get_watchlists():
