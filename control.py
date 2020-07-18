@@ -3,8 +3,7 @@ Functions that the router consumes. We do the dirty work here.
 '''
 from os import listdir
 from pathlib import Path
-import json
-from baquet.user import Directory, User, hydrate_user_identifiers
+from baquet.user import Directory, User
 from baquet.watchlist import Watchlist
 
 _WL_PATH = Path("./watchlists")
@@ -33,7 +32,8 @@ def get_users(page, page_size):
     '''
     Get a list of users and top level info, paginated.
     '''
-    return Directory().get(page=page, page_size=page_size)
+    directory = Directory()
+    return directory.get_directory(page=page, page_size=page_size)
 
 
 def get_user(user_id):
@@ -105,14 +105,16 @@ def get_stats(user_id, watchlist_id):
     Get a user's stats.
     '''
     user = _user_helper(user_id)
-    wl = _wl_helper(watchlist_id)
+    watchlist = _wl_helper(watchlist_id)
     return {
-        'followers_watchlist_percent': user.get_followers_watchlist_percent(watchlist=wl),
-        'followers_watchlist_completion': user.get_followers_watchlist_completion(watchlist=wl),
-        'friends_watchlist_percent': user.get_friends_watchlist_percent(watchlist=wl),
-        'friends_watchlist_completion': user.get_friends_watchlist_completion(watchlist=wl),
-        'favorite_watchlist_percent': user.get_favorite_watchlist_percent(watchlist=wl),
-        'retweet_watchlist_percent': user.get_retweet_watchlist_percent(watchlist=wl)
+        'followers_watchlist_percent': user.get_followers_watchlist_percent(watchlist=watchlist),
+        'followers_watchlist_completion': user.get_followers_watchlist_completion(
+            watchlist=watchlist
+        ),
+        'friends_watchlist_percent': user.get_friends_watchlist_percent(watchlist=watchlist),
+        'friends_watchlist_completion': user.get_friends_watchlist_completion(watchlist=watchlist),
+        'favorite_watchlist_percent': user.get_favorite_watchlist_percent(watchlist=watchlist),
+        'retweet_watchlist_percent': user.get_retweet_watchlist_percent(watchlist=watchlist)
     }
 
 
