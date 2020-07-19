@@ -20,7 +20,7 @@ async def get_users(page: int = 1, page_size: int = 20):
 
 
 @CECIL.get("/users/{user_id}", response_model=models.User)
-async def get_user(user_id: int):
+async def get_user(user_id: str):
     '''
     Get a user's top level info.
     '''
@@ -33,9 +33,33 @@ async def get_user(user_id: int):
     return response
 
 
+@CECIL.get("/users/{user_id}/notes/", response_model=models.PaginateUserNotes)
+async def get_notes_user(user_id: str, page: int = 1, page_size: int = 20):
+    '''
+    Get the notes about a user.
+    '''
+    return control.get_notes_user(user_id, page, page_size)
+
+
+@CECIL.post("/users/{user_id}/notes/")
+async def add_note_user(user_id: str, note: models.AddText):
+    '''
+    Add a note to a user's file.
+    '''
+    control.add_note_user(user_id, note.text)
+
+
+@CECIL.delete("/users/{user_id}/notes/{note_id}")
+async def remove_note_user(user_id: str, note_id: str):
+    '''
+    Remove a note from a user's file.
+    '''
+    control.remove_note_user(user_id, note_id)
+
+
 @CECIL.get("/users/{user_id}/favorites/", response_model=models.PaginateFavorites)
 async def get_favorites(
-        user_id: int,
+        user_id: str,
         page: int = 1,
         page_size: int = 20,
         watchlist_id: str = None,
@@ -54,9 +78,57 @@ async def get_favorites(
     return response
 
 
+@CECIL.post("/users/{user_id}/favorites/{tweet_id}/tags/")
+async def add_tag_favorite(
+        user_id: str,
+        tweet_id: str,
+        tag: models.AddText
+):
+    '''
+    Add a tag to a user's timeline tweet.
+    '''
+    control.add_tag_favorite(user_id, tweet_id, tag.text)
+
+
+@CECIL.delete("/users/{user_id}/favorite/{tweet_id}/tags/{tag_id}")
+async def remove_tag_favorite(
+        user_id: str,
+        tweet_id: str,
+        tag_id: str
+):
+    '''
+    Delete a tag from user's timeline tweet.
+    '''
+    control.remove_tag_favorite(user_id, tweet_id, tag_id)
+
+
+@CECIL.post("/users/{user_id}/favorite/{tweet_id}/notes/")
+async def add_note_favorite(
+        user_id: str,
+        tweet_id: str,
+        note: models.AddText
+):
+    '''
+    Add a note to a user's timeline tweet.
+    '''
+    control.add_note_favorite(user_id, tweet_id, note.text)
+
+
+@CECIL.delete("/users/{user_id}/favorite/{tweet_id}/notes/{note_id}")
+async def remove_note_favorite(
+        user_id: str,
+        tweet_id: str,
+        note_id: str
+):
+    '''
+    Delete a note from user's timeline tweet.
+    '''
+    control.remove_note_favorite(user_id, tweet_id, note_id)
+
+
 @CECIL.get("/users/{user_id}/timeline/", response_model=models.PaginateTimeline)
 async def get_timeline(
-        user_id: int,
+        user_id: str,
         page: int = 1,
         page_size: int = 20,
         watchlist_id: str = None,
@@ -75,9 +147,57 @@ async def get_timeline(
     return response
 
 
+@CECIL.post("/users/{user_id}/timeline/{tweet_id}/tags/")
+async def add_tag_timeline(
+        user_id: str,
+        tweet_id: str,
+        tag: models.AddText
+):
+    '''
+    Add a tag to a user's timeline tweet.
+    '''
+    control.add_tag_timeline(user_id, tweet_id, tag.text)
+
+
+@CECIL.delete("/users/{user_id}/timeline/{tweet_id}/tags/{tag_id}")
+async def remove_tag_timeline(
+        user_id: str,
+        tweet_id: str,
+        tag_id: str
+):
+    '''
+    Delete a tag from user's timeline tweet.
+    '''
+    control.remove_tag_timeline(user_id, tweet_id, tag_id)
+
+
+@CECIL.post("/users/{user_id}/timeline/{tweet_id}/notes/")
+async def add_note_timeline(
+        user_id: str,
+        tweet_id: str,
+        note: models.AddText
+):
+    '''
+    Add a note to a user's timeline tweet.
+    '''
+    control.add_note_timeline(user_id, tweet_id, note.text)
+
+
+@CECIL.delete("/users/{user_id}/timeline/{tweet_id}/notes/{note_id}")
+async def remove_note_timeline(
+        user_id: str,
+        tweet_id: str,
+        note_id: str
+):
+    '''
+    Delete a note from user's timeline tweet.
+    '''
+    control.remove_note_timeline(user_id, tweet_id, note_id)
+
+
 @CECIL.get("/users/{user_id}/followers/", response_model=models.PaginateFriendsOrFollowing)
 async def get_followers(
-        user_id: int,
+        user_id: str,
         page: int = 1,
         page_size: int = 1500,
         watchlist_id: str = None
@@ -98,7 +218,7 @@ async def get_followers(
 
 @CECIL.get("/users/{user_id}/friends/", response_model=models.PaginateFriendsOrFollowing)
 async def get_friends(
-        user_id: int,
+        user_id: str,
         page: int = 1,
         page_size: int = 1500,
         watchlist_id: str = None
@@ -118,7 +238,7 @@ async def get_friends(
 
 
 @CECIL.get("/users/{user_id}/stats/{watchlist_id}", response_model=models.UserStats)
-async def get_stats(user_id: int, watchlist_id: str):
+async def get_stats(user_id: str, watchlist_id: str):
     '''
     Get a user's friends.
     '''
@@ -202,12 +322,12 @@ async def get_watchwords(watchlist_name: str):
 
 
 @CECIL.post("/watchlists/{watchlist_name}/words/")
-async def add_watchword(watchlist_name: str, watchword: models.AddWatchword):
+async def add_watchword(watchlist_name: str, watchword: models.AddText):
     '''
     Add a search term to the watchwords.
     '''
     try:
-        control.add_watchword(watchlist_name, watchword)
+        control.add_watchword(watchlist_name, watchword.text)
     except FileNotFoundError:
         raise HTTPException(
             status_code=404, detail=f'Watchlist, {watchlist_name}, does not exist.')

@@ -1,7 +1,7 @@
 '''
 Pydantic models for requests and responses.
 '''
-from typing import List
+from typing import List, Any
 from datetime import datetime
 from pydantic import BaseModel
 
@@ -37,7 +37,7 @@ class User(BaseModel):
     friends_count: int = None
     geo_enabled: bool = False
     has_extended_profile: bool = False
-    user_id: int
+    user_id: str
     is_translation_enabled: bool = False
     is_translator: bool = False
     lang: str = None
@@ -60,7 +60,69 @@ class User(BaseModel):
         orm_mode = True
 
 
+class Tag(BaseModel):
+    '''
+    Embedded tag.
+    '''
+    tag_id: str
+    text: str
+
+    class Config:
+        '''Accept SQLAlchemy objects.'''
+        orm_mode = True
+
+
+class TagAssociator(BaseModel):
+    '''
+    Association object. Maybe rethink this.
+    '''
+    tweet_id: str
+    tag_id: str
+    tag: Tag
+
+    class Config:
+        '''Accept SQLAlchemy objects.'''
+        orm_mode = True
+
+
+class BaseNote(BaseModel):
+    '''
+    Base model note.
+    '''
+    note_id: Any
+    text: str
+    created_at: datetime
+
+    class Config:
+        '''Accept SQLAlchemy objects.'''
+        orm_mode = True
+
+
+class UserNote(BaseNote):
+    '''
+    User note.
+    '''
+    pass  # pylint: disable=unnecessary-pass
+
+
+class PaginateUserNotes(Paginate):
+    '''
+    Paginate user notes.
+    '''
+    items: List[UserNote]
+
+
+class TweetNote(BaseNote):
+    '''
+    A note on a tweet.
+    '''
+    tweet_id: str
+
+
 class UserStats(BaseModel):
+    '''
+    House all the  stats under one roof.
+    '''
     followers_watchlist_percent: float
     followers_watchlist_completion: float
     friends_watchlist_percent: float
@@ -83,7 +145,7 @@ class BaseTweet(BaseModel):
     created_at: datetime
     entities: dict = None
     favorite_count: int
-    tweet_id: int
+    tweet_id: str
     is_quote_status: bool
     lang: str
     possibly_sensitive: bool
@@ -91,9 +153,11 @@ class BaseTweet(BaseModel):
     source: str
     source_url: str
     text: str
-    user_id: int
+    user_id: str
     screen_name: str
     name: str
+    notes: List[TweetNote]
+    tags: List[TagAssociator]
     last_updated: datetime
 
     class Config:
@@ -119,7 +183,7 @@ class TimelineTweet(BaseTweet):
     '''
     Timelines can have retweets.
     '''
-    retweet_user_id: int = None
+    retweet_user_id: str = None
     retweet_screen_name: str = None
     retweet_name: str = None
 
@@ -132,7 +196,10 @@ class PaginateTimeline(Paginate):
 
 
 class FriendsOrFollowing(BaseModel):
-    user_id: int
+    '''
+    Return user id at the top level, and if provided, a user object.
+    '''
+    user_id: str
     user: User = None
 
     class Config:
@@ -156,15 +223,15 @@ class WatchlistInfo(BaseModel):
     watchword_count: int
 
 
-class AddWatchword(BaseModel):
-    '''
-    Add a single search term to the watchlist.
-    '''
-    word: str
-
-
 class AddUser(BaseModel):
     '''
     Add a single user.
     '''
-    user_id: int
+    user_id: str
+
+
+class AddText(BaseModel):
+    '''
+    Simple request that accepts a singular string.
+    '''
+    text: str
