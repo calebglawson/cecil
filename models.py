@@ -72,19 +72,6 @@ class Tag(BaseModel):
         orm_mode = True
 
 
-class TagAssociator(BaseModel):
-    '''
-    Association object. Maybe rethink this.
-    '''
-    tweet_id: str
-    tag_id: str
-    tag: Tag
-
-    class Config:
-        '''Accept SQLAlchemy objects.'''
-        orm_mode = True
-
-
 class BaseNote(BaseModel):
     '''
     Base model note.
@@ -156,8 +143,6 @@ class BaseTweet(BaseModel):
     user_id: str
     screen_name: str
     name: str
-    notes: List[TweetNote]
-    tags: List[TagAssociator]
     last_updated: datetime
 
     class Config:
