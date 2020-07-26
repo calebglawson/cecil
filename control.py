@@ -49,7 +49,7 @@ def get_notes_user(user_id, page, page_size):
     Get a user's notes.
     '''
     user = _user_helper(user_id)
-    return user.get_notes(page=page, page_size=page_size)
+    return user.get_notes_user(page=page, page_size=page_size)
 
 
 def add_note_user(user_id, note):
@@ -57,7 +57,7 @@ def add_note_user(user_id, note):
     Add a note to a user.
     '''
     user = _user_helper(user_id)
-    user.add_note(note)
+    user.add_note_user(note)
 
 
 def remove_note_user(user_id, note_id):
@@ -65,7 +65,7 @@ def remove_note_user(user_id, note_id):
     Remove a note from a user.
     '''
     user = _user_helper(user_id)
-    user.remove_note(note_id)
+    user.remove_note_user(note_id)
 
 
 def get_favorites(user_id, page, page_size, watchlist_id, watchwords_id):
@@ -87,7 +87,7 @@ def add_tag_favorite(user_id, tweet_id, tag):
     Add a tag to a user's favorited tweet.
     '''
     user = _user_helper(user_id)
-    user.tag_favorite(tweet_id, tag)
+    user.add_tag_favorite(tweet_id, tag)
 
 
 def remove_tag_favorite(user_id, tweet_id, tag_id):
@@ -95,7 +95,7 @@ def remove_tag_favorite(user_id, tweet_id, tag_id):
     Remove a tag from a user's favorited tweet.
     '''
     user = _user_helper(user_id)
-    user.untag_timeline(tweet_id, tag_id)
+    user.remove_tag_timeline(tweet_id, tag_id)
 
 
 def add_note_favorite(user_id, tweet_id, note):
@@ -133,7 +133,7 @@ def add_tag_timeline(user_id, tweet_id, tag):
     Add a tag to a user's timeline tweet.
     '''
     user = _user_helper(user_id)
-    user.tag_timeline(tweet_id, tag)
+    user.add_tag_timeline(tweet_id, tag)
 
 
 def remove_tag_timeline(user_id, tweet_id, tag_id):
@@ -141,7 +141,7 @@ def remove_tag_timeline(user_id, tweet_id, tag_id):
     Remove a tag from a user's timeline tweet.
     '''
     user = _user_helper(user_id)
-    user.untag_timeline(tweet_id, tag_id)
+    user.remove_tag_timeline(tweet_id, tag_id)
 
 
 def add_note_timeline(user_id, tweet_id, note):
