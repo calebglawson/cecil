@@ -61,9 +61,28 @@ async def get_favorites(
 
     return response
 
-# /users/{user_id}/favorites/tags/ get
 
-# /users/{user_id}/favorites/tags/{tag_id} get
+@CECIL.get("/users/{user_id}/favorites/tags", response_model=List[models.Tag])
+async def get_tags_favorites(
+        user_id: str
+):
+    '''
+    Get a list of tags that apply to one or more of a user's favorites.
+    '''
+    return control.get_tags_favorites(user_id)
+
+
+@CECIL.get("/users/{user_id}/favorites/tags/{tag_id}", response_model=models.PaginateFavorites)
+async def get_favorites_tagged(
+        user_id: str,
+        tag_id: int,
+        page: int = 1,
+        page_size: int = 20,
+):
+    '''
+    Get a list of favorites that have this particular tag.
+    '''
+    return control.get_favorites_tagged(user_id, tag_id, page, page_size)
 
 # /users/{user_id}/favorite/{tweet_id}/notes/ get
 

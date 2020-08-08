@@ -130,7 +130,7 @@ class BaseTweet(BaseModel):
     Base twitter post.
     '''
     created_at: datetime
-    entities: dict = None
+    entities: Any = None
     favorite_count: int
     tweet_id: str
     is_quote_status: bool

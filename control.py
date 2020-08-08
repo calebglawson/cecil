@@ -18,14 +18,14 @@ def _exists(directoryname, filename):
         raise FileNotFoundError
 
 
-def _wl_helper(watchlist_id):
-    _exists("watchlists", watchlist_id)
-    return Watchlist(watchlist_id)
-
-
 def _user_helper(user_id):
     _exists("users", user_id)
     return User(user_id)
+
+
+def _wl_helper(watchlist_id):
+    _exists("watchlists", watchlist_id)
+    return Watchlist(watchlist_id)
 
 
 def get_users(page, page_size):
@@ -36,36 +36,19 @@ def get_users(page, page_size):
     return directory.get_directory(page=page, page_size=page_size)
 
 
+def add_user(user_id):
+    '''
+    Add a user.
+    '''
+    User(user_id).get_user()
+
+
 def get_user(user_id):
     '''
     Get a user's top level info.
     '''
     user = _user_helper(user_id)
     return user.get_user()
-
-
-def get_notes_user(user_id, page, page_size):
-    '''
-    Get a user's notes.
-    '''
-    user = _user_helper(user_id)
-    return user.get_notes_user(page=page, page_size=page_size)
-
-
-def add_note_user(user_id, note):
-    '''
-    Add a note to a user.
-    '''
-    user = _user_helper(user_id)
-    user.add_note_user(note)
-
-
-def remove_note_user(user_id, note_id):
-    '''
-    Remove a note from a user.
-    '''
-    user = _user_helper(user_id)
-    user.remove_note_user(note_id)
 
 
 def get_favorites(user_id, page, page_size, watchlist_id, watchwords_id):
@@ -82,20 +65,22 @@ def get_favorites(user_id, page, page_size, watchlist_id, watchwords_id):
     )
 
 
-def add_tag_favorite(user_id, tweet_id, tag):
+def get_tags_favorites(user_id):
     '''
-    Add a tag to a user's favorited tweet.
-    '''
-    user = _user_helper(user_id)
-    user.add_tag_favorite(tweet_id, tag)
-
-
-def remove_tag_favorite(user_id, tweet_id, tag_id):
-    '''
-    Remove a tag from a user's favorited tweet.
+    Get the tags applying to one or more favorites.
     '''
     user = _user_helper(user_id)
-    user.remove_tag_timeline(tweet_id, tag_id)
+    return user.get_tags("favorite")
+
+
+def get_favorites_tagged(user_id, tag_id, page, page_size):
+    '''
+    Get the favorites that have this particular tag.
+    '''
+    user = _user_helper(user_id)
+    return user.get_favorites_tagged(tag_id, page, page_size=page_size)
+
+# get_favorites_notes
 
 
 def add_note_favorite(user_id, tweet_id, note):
@@ -113,51 +98,23 @@ def remove_note_favorite(user_id, tweet_id, note_id):
     user = _user_helper(user_id)
     user.remove_note_favorite(tweet_id, note_id)
 
-
-def get_timeline(user_id, page, page_size, watchlist_id, watchwords_id):
-    '''
-    Get a user's timeline.
-    '''
-    user = _user_helper(user_id)
-    if watchlist_id:
-        watchlist_id = _wl_helper(watchlist_id)
-    if watchwords_id:
-        watchwords_id = _wl_helper(watchwords_id)
-    return user.get_timeline(
-        page, page_size, watchlist=watchlist_id, watchwords=watchwords_id
-    )
+# get_tags_favorite
 
 
-def add_tag_timeline(user_id, tweet_id, tag):
+def add_tag_favorite(user_id, tweet_id, tag):
     '''
-    Add a tag to a user's timeline tweet.
+    Add a tag to a user's favorited tweet.
     '''
     user = _user_helper(user_id)
-    user.add_tag_timeline(tweet_id, tag)
+    user.add_tag_favorite(tweet_id, tag)
 
 
-def remove_tag_timeline(user_id, tweet_id, tag_id):
+def remove_tag_favorite(user_id, tweet_id, tag_id):
     '''
-    Remove a tag from a user's timeline tweet.
+    Remove a tag from a user's favorited tweet.
     '''
     user = _user_helper(user_id)
     user.remove_tag_timeline(tweet_id, tag_id)
-
-
-def add_note_timeline(user_id, tweet_id, note):
-    '''
-    Add a note to a user's timeline tweet.
-    '''
-    user = _user_helper(user_id)
-    user.add_note_timeline(tweet_id, note)
-
-
-def remove_note_timeline(user_id, tweet_id, note_id):
-    '''
-    Remove a note from a user's timeline tweet.
-    '''
-    user = _user_helper(user_id)
-    user.remove_note_timeline(tweet_id, note_id)
 
 
 def get_followers(user_id, page, page_size, watchlist_id):
@@ -188,6 +145,30 @@ def get_friends(user_id, page, page_size, watchlist_id):
         page=page, page_size=page_size, watchlist=watchlist_id)
 
 
+def get_notes_user(user_id, page, page_size):
+    '''
+    Get a user's notes.
+    '''
+    user = _user_helper(user_id)
+    return user.get_notes_user(page=page, page_size=page_size)
+
+
+def add_note_user(user_id, note):
+    '''
+    Add a note to a user.
+    '''
+    user = _user_helper(user_id)
+    user.add_note_user(note)
+
+
+def remove_note_user(user_id, note_id):
+    '''
+    Remove a note from a user.
+    '''
+    user = _user_helper(user_id)
+    user.remove_note_user(note_id)
+
+
 def get_stats(user_id, watchlist_id):
     '''
     Get a user's stats.
@@ -206,11 +187,58 @@ def get_stats(user_id, watchlist_id):
     }
 
 
-def add_user(user_id):
+def get_timeline(user_id, page, page_size, watchlist_id, watchwords_id):
     '''
-    Add a user.
+    Get a user's timeline.
     '''
-    User(user_id).get_user()
+    user = _user_helper(user_id)
+    if watchlist_id:
+        watchlist_id = _wl_helper(watchlist_id)
+    if watchwords_id:
+        watchwords_id = _wl_helper(watchwords_id)
+    return user.get_timeline(
+        page, page_size, watchlist=watchlist_id, watchwords=watchwords_id
+    )
+
+# get_timeline tags
+
+# get_timeline_tagged
+
+
+# Get note timeline
+
+def add_note_timeline(user_id, tweet_id, note):
+    '''
+    Add a note to a user's timeline tweet.
+    '''
+    user = _user_helper(user_id)
+    user.add_note_timeline(tweet_id, note)
+
+
+def remove_note_timeline(user_id, tweet_id, note_id):
+    '''
+    Remove a note from a user's timeline tweet.
+    '''
+    user = _user_helper(user_id)
+    user.remove_note_timeline(tweet_id, note_id)
+
+# get_timeline_tewet_tags
+
+
+def add_tag_timeline(user_id, tweet_id, tag):
+    '''
+    Add a tag to a user's timeline tweet.
+    '''
+    user = _user_helper(user_id)
+    user.add_tag_timeline(tweet_id, tag)
+
+
+def remove_tag_timeline(user_id, tweet_id, tag_id):
+    '''
+    Remove a tag from a user's timeline tweet.
+    '''
+    user = _user_helper(user_id)
+    user.remove_tag_timeline(tweet_id, tag_id)
 
 
 def get_watchlists():
