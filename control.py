@@ -80,7 +80,13 @@ def get_favorites_tagged(user_id, tag_id, page, page_size):
     user = _user_helper(user_id)
     return user.get_favorites_tagged(tag_id, page, page_size=page_size)
 
-# get_favorites_notes
+
+def get_notes_favorite(user_id, tweet_id):
+    '''
+    Get a favorite's notes.
+    '''
+    user = _user_helper(user_id)
+    return user.get_notes_favorite(tweet_id)
 
 
 def add_note_favorite(user_id, tweet_id, note):
@@ -98,7 +104,13 @@ def remove_note_favorite(user_id, tweet_id, note_id):
     user = _user_helper(user_id)
     user.remove_note_favorite(tweet_id, note_id)
 
-# get_tags_favorite
+
+def get_tags_favorite(user_id, tweet_id):
+    '''
+    Get all the tags of a favorite.
+    '''
+    user = _user_helper(user_id)
+    return user.get_tags_favorite(tweet_id)
 
 
 def add_tag_favorite(user_id, tweet_id, tag):
@@ -200,12 +212,30 @@ def get_timeline(user_id, page, page_size, watchlist_id, watchwords_id):
         page, page_size, watchlist=watchlist_id, watchwords=watchwords_id
     )
 
-# get_timeline tags
 
-# get_timeline_tagged
+def get_tags_timelines(user_id):
+    '''
+    Get a user's tags.
+    '''
+    user = _user_helper(user_id)
+    return user.get_tags("timeline")
 
 
-# Get note timeline
+def get_timeline_tagged(user_id, tag_id, page, page_size):
+    '''
+    Get timeline tweets tagged.
+    '''
+    user = _user_helper(user_id)
+    return user.get_timeline_tagged(tag_id, page, page_size)
+
+
+def get_notes_timeline(user_id, tweet_id):
+    '''
+    Get a user's tweets.
+    '''
+    user = _user_helper(user_id)
+    return user.get_notes_timeline(tweet_id)
+
 
 def add_note_timeline(user_id, tweet_id, note):
     '''
@@ -222,7 +252,13 @@ def remove_note_timeline(user_id, tweet_id, note_id):
     user = _user_helper(user_id)
     user.remove_note_timeline(tweet_id, note_id)
 
-# get_timeline_tewet_tags
+
+def get_tags_timeline(user_id, tweet_id):
+    '''
+    Get the tags on a particular timeline tweet.
+    '''
+    user = _user_helper(user_id)
+    return user.get_tags_timeline(tweet_id)
 
 
 def add_tag_timeline(user_id, tweet_id, tag):
