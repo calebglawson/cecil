@@ -307,6 +307,13 @@ def get_watchlist_users(watchlist_id):
     return watchlist.get_watchlist_users()
 
 
+def create_watchlist(watchlist_id):
+    '''
+    Create a watchlsit.
+    '''
+    Watchlist(watchlist_id)
+
+
 def add_watchlist(watchlist_id, user_id):
     '''
     Add a user to the watchlist.

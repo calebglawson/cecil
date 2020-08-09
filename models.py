@@ -208,6 +208,13 @@ class WatchlistInfo(BaseModel):
     watchword_count: int
 
 
+class AddWatchlist(BaseModel):
+    '''
+    Create a watchlist.
+    '''
+    watchlist_id: str
+
+
 class AddUser(BaseModel):
     '''
     Add a single user.

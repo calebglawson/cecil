@@ -84,7 +84,16 @@ async def get_favorites_tagged(
     '''
     return control.get_favorites_tagged(user_id, tag_id, page, page_size)
 
-# /users/{user_id}/favorite/{tweet_id}/notes/ get
+
+@CECIL.get("/users/{user_id}/favorite/{tweet_id}/notes/")
+async def get_notes_favorite(
+        user_id: str,
+        tweet_id: str,
+):
+    '''
+    Get a list of notes on a particular tweet.
+    '''
+    return control.get_notes_favorite(user_id, tweet_id)
 
 
 @CECIL.post("/users/{user_id}/favorite/{tweet_id}/notes/")
@@ -111,7 +120,16 @@ async def remove_note_favorite(
     control.remove_note_favorite(user_id, tweet_id, note_id)
 
 
-# /users/{user_id}/favorites/{tweet_id}/tags/ get
+@CECIL.get("/users/{user_id}/favorites/{tweet_id}/tags/")
+async def get_tags_favorite(
+        user_id: str,
+        tweet_id: str
+):
+    '''
+    Get the tags on a particular tweet.
+    '''
+    control.get_tags_favorite(user_id, tweet_id)
+
 
 @CECIL.post("/users/{user_id}/favorites/{tweet_id}/tags/")
 async def add_tag_favorite(
@@ -136,7 +154,18 @@ async def remove_tag_favorite(
     '''
     control.remove_tag_favorite(user_id, tweet_id, tag_id)
 
-# /users/{user_id}/followers/ get
+
+@CECIL.get("/users/{user_id}/followers/", response_model=models.PaginateFriendsOrFollowing)
+async def get_followers(
+        user_id: str,
+        page: int = 1,
+        page_size: int = 1500,
+        watchlist_id: str = None,
+):
+    '''
+    Get a user's followers.
+    '''
+    return control.get_followers(user_id, page, page_size, watchlist_id)
 
 
 @CECIL.get("/users/{user_id}/friends/", response_model=models.PaginateFriendsOrFollowing)
@@ -218,11 +247,39 @@ async def get_timeline(
 
     return response
 
-# /users/{user_id}/timeline/tags/ get
 
-# /users/{user_id}/timeline/tags/{tag_id} get
+@CECIL.get("/users/{user_id}/timeline/tags/")
+async def get_tags_timelines(
+        user_id: str
+):
+    '''
+    Get a timeline's tags.
+    '''
+    return control.get_tags_timelines(user_id)
 
-# /users/{user_id}/timeline/{tweet_id}/notes/ get
+
+@CECIL.get("/users/{user_id}/timeline/tags/{tag_id}")
+async def get_timeline_tagged(
+        user_id: str,
+        tag_id: str,
+        page: int = 1,
+        page_size: int = 20
+):
+    '''
+    Get timelines tagged.
+    '''
+    return control.get_timeline_tagged(user_id, tag_id, page, page_size)
+
+
+@CECIL.get("/users/{user_id}/timeline/{tweet_id}/notes/")
+async def get_notes_timeline(
+        user_id: str,
+        tweet_id: str,
+):
+    '''
+    Get timeline tweet notes.
+    '''
+    return control.get_notes_timeline(user_id, tweet_id)
 
 
 @CECIL.post("/users/{user_id}/timeline/{tweet_id}/notes/")
@@ -248,7 +305,16 @@ async def remove_note_timeline(
     '''
     control.remove_note_timeline(user_id, tweet_id, note_id)
 
-# /users/{user_id}/timeline/{tweet_id}/tags/ get
+
+@CECIL.get("/users/{user_id}/timeline/{tweet_id}/tags/")
+async def get_tags_timeline(
+        user_id: str,
+        tweet_id: str,
+):
+    '''
+    Get the tags on a timeline tweet.
+    '''
+    control.get_tags_timeline(user_id, tweet_id)
 
 
 @CECIL.post("/users/{user_id}/timeline/{tweet_id}/tags/")
@@ -282,7 +348,15 @@ async def get_watchlists():
     '''
     return control.get_watchlists()
 
-# /watchlists/ post
+
+@CECIL.post("/watchlists/")
+async def add_watchlist(
+        watchlist: models.AddWatchlist
+):
+    '''
+    Create a watchlist.
+    '''
+    return control.create_watchlist(watchlist.watchlist_id)
 
 
 @CECIL.get("/watchlists/{watchlist_name}", response_model=models.WatchlistInfo)
