@@ -319,7 +319,8 @@ def add_watchlist(watchlist_id, user_id):
     Add a user to the watchlist.
     '''
     watchlist = _wl_helper(watchlist_id)
-    watchlist.add_watchlist(user_id)
+    user = _user_helper(user_id)
+    watchlist.add_watchlist(user)
 
 
 def get_watchwords(watchlist_id):
