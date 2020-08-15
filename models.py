@@ -72,19 +72,6 @@ class Tag(BaseModel):
         orm_mode = True
 
 
-class TagAssociator(BaseModel):
-    '''
-    Association object. Maybe rethink this.
-    '''
-    tweet_id: str
-    tag_id: str
-    tag: Tag
-
-    class Config:
-        '''Accept SQLAlchemy objects.'''
-        orm_mode = True
-
-
 class BaseNote(BaseModel):
     '''
     Base model note.
@@ -143,7 +130,7 @@ class BaseTweet(BaseModel):
     Base twitter post.
     '''
     created_at: datetime
-    entities: dict = None
+    entities: Any = None
     favorite_count: int
     tweet_id: str
     is_quote_status: bool
@@ -156,8 +143,6 @@ class BaseTweet(BaseModel):
     user_id: str
     screen_name: str
     name: str
-    notes: List[TweetNote]
-    tags: List[TagAssociator]
     last_updated: datetime
 
     class Config:
@@ -221,6 +206,13 @@ class WatchlistInfo(BaseModel):
     name: str
     watchlist_count: int
     watchword_count: int
+
+
+class AddWatchlist(BaseModel):
+    '''
+    Create a watchlist.
+    '''
+    watchlist_id: str
 
 
 class AddUser(BaseModel):
