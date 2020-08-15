@@ -281,7 +281,12 @@ def get_watchlists():
     '''
     Get a list of watchlists in the watchlist directory.
     '''
-    return [fn.split(".")[0] for fn in listdir(_WL_PATH)]
+    if _WL_PATH.exists():
+        result = [fn.split(".")[0] for fn in listdir(_WL_PATH)]
+    else:
+        result = []
+
+    return result
 
 
 def get_watchlist(watchlist_id):

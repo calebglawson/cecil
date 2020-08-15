@@ -72,7 +72,6 @@ async def get_tags_favorites(
     return control.get_tags_favorites(user_id)
 
 
-# Entities are messed up in this method. Baquet problem.
 @CECIL.get("/users/{user_id}/favorites/tags/{tag_id}", response_model=models.PaginateFavorites)
 async def get_favorites_tagged(
         user_id: str,
@@ -120,7 +119,7 @@ async def remove_note_favorite(
     '''
     control.remove_note_favorite(user_id, tweet_id, note_id)
 
-# There's no created_at
+
 @CECIL.get("/users/{user_id}/favorites/{tweet_id}/tags/", response_model=List[models.Tag])
 async def get_tags_favorite(
         user_id: str,
@@ -143,7 +142,7 @@ async def add_tag_favorite(
     '''
     control.add_tag_favorite(user_id, tweet_id, tag.text)
 
-# Baquet bug in find query.
+
 @CECIL.delete("/users/{user_id}/favorites/{tweet_id}/tags/{tag_id}")
 async def remove_tag_favorite(
         user_id: str,
@@ -213,7 +212,7 @@ async def remove_note_user(user_id: str, note_id: str):
     '''
     control.remove_note_user(user_id, note_id)
 
-# Get retweet watchlist percent has errors.
+
 @CECIL.get("/users/{user_id}/stats/{watchlist_id}", response_model=models.UserStats)
 async def get_stats(user_id: str, watchlist_id: str):
     '''
@@ -258,7 +257,7 @@ async def get_tags_timelines(
     '''
     return control.get_tags_timelines(user_id)
 
-# The entities here are not serialized properly
+
 @CECIL.get("/users/{user_id}/timeline/tags/{tag_id}")
 async def get_timeline_tagged(
         user_id: str,
@@ -349,7 +348,7 @@ async def get_watchlists():
     '''
     return control.get_watchlists()
 
-# Errors out when the path doesn't exist
+
 @CECIL.post("/watchlists/")
 async def add_watchlist(
         watchlist: models.AddWatchlist
@@ -373,7 +372,7 @@ async def get_watchlist(watchlist_name: str):
 
     return response
 
-# Baquet problem in hydrate user identifiers, if it returns combined results, stuff can get hairy.
+
 @CECIL.get("/watchlists/{watchlist_name}/users/", response_model=List[models.User])
 async def get_watchlist_users(watchlist_name: str):
     '''
@@ -387,7 +386,7 @@ async def get_watchlist_users(watchlist_name: str):
 
     return response
 
-# Baquet problem, there's a problem when it's an int.
+
 @CECIL.post("/watchlists/{watchlist_name}/users/")
 async def add_watchlist_users(watchlist_name: str, user: models.AddUser):
     '''
