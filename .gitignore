@@ -3,3 +3,4 @@ baquet
 users
 watchlists
 config.json
+*.db

@@ -6,6 +6,16 @@ from datetime import datetime
 from pydantic import BaseModel
 
 
+class InviteCode(BaseModel):
+    '''
+    Used for listing invite codes, without revealing the actual codes.
+    '''
+    invite_id: int
+    expires_at: datetime
+    created_by: int
+    created_at: datetime
+
+
 class RegistrationData(BaseModel):
     '''
     Information needed for signup.

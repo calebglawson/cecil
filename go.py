@@ -15,7 +15,6 @@ from sqlalchemy import create_engine
 import sql_models
 import models
 import control
-
 from constants import CecilConstants
 
 
@@ -181,7 +180,6 @@ async def register(registration_data: models.RegistrationData):
     '''
     Register with an invite code.
     '''
-    # TODO: make the user confirm their password.
     invite_codes = CONN.query(sql_models.InviteCode).all()
     invited = False
     for invite in invite_codes:
@@ -201,11 +199,21 @@ async def register(registration_data: models.RegistrationData):
         CONN.delete(chosen)
         CONN.commit()
 
-# Get invite codes
+
+@CECIL.get("/invite_codes/", response_model=models.InviteCode)
+async def get_invite_codes(
+        current_user: models.AuthUser = Depends(  # pylint: disable=unused-argument
+            get_current_active_user
+        )
+):
+    '''
+    List the created invite codes.
+    '''
+    return CONN.query(sql_models.InviteCode).all()
 
 
 @CECIL.post("/invite_codes/")
-async def invite_code(
+async def post_invite_code(
         invite_c: models.AddText,
         current_user: models.AuthUser = Depends(get_current_admin_user)
 ):
@@ -226,7 +234,22 @@ async def invite_code(
     CONN.add(invite)
     CONN.commit()
 
-# Delete invite codes
+
+@CECIL.delete("/invite_codes/{invite_code_id}")
+async def delete_invite_code(
+        invite_code_id: int,
+        current_user: models.AuthUser = Depends(  # pylint: disable=unused-argument
+            get_current_admin_user
+        )
+):
+    '''
+    Delete an invite code manually.
+    '''
+    invite_code = CONN.query(sql_models.InviteCode).filter(
+        sql_models.InviteCode.invite_id == invite_code_id
+    ).first()
+    CONN.delete(invite_code)
+    CONN.commit()
 
 # Update password
 
@@ -258,7 +281,13 @@ async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(
 
 
 @CECIL.get("/users/", response_model=models.PaginateUser)
-async def get_users(page: int = 1, page_size: int = 20):
+async def get_users(
+        page: int = 1,
+        page_size: int = 20,
+        current_user: models.AuthUser = Depends(  # pylint: disable=unused-argument
+            get_current_active_user
+        )
+):
     '''
     Get a list of users and top level info in the user directory.
     '''
@@ -266,7 +295,12 @@ async def get_users(page: int = 1, page_size: int = 20):
 
 
 @CECIL.post("/users/")
-async def add_user(user: models.AddUser):
+async def add_user(
+        user: models.AddUser,
+        current_user: models.AuthUser = Depends(  # pylint: disable=unused-argument
+            get_current_active_user
+        )
+):
     '''
     Add a user to the directory.
     '''
@@ -274,7 +308,12 @@ async def add_user(user: models.AddUser):
 
 
 @CECIL.get("/users/{user_id}", response_model=models.User)
-async def get_user(user_id: str):
+async def get_user(
+        user_id: str,
+        current_user: models.AuthUser = Depends(  # pylint: disable=unused-argument
+            get_current_active_user
+        )
+):
     '''
     Get a user's top level info.
     '''
@@ -293,7 +332,10 @@ async def get_favorites(
         page: int = 1,
         page_size: int = 20,
         watchlist_id: str = None,
-        watchwords_id: str = None
+        watchwords_id: str = None,
+        current_user: models.AuthUser = Depends(  # pylint: disable=unused-argument
+            get_current_active_user
+        )
 ):
     '''
     Get a user's favorites.
@@ -310,7 +352,10 @@ async def get_favorites(
 
 @CECIL.get("/users/{user_id}/favorites/tags", response_model=models.PaginateFavorites)
 async def get_tags_favorites(
-        user_id: str
+        user_id: str,
+        current_user: models.AuthUser = Depends(  # pylint: disable=unused-argument
+            get_current_active_user
+        )
 ):
     '''
     Get a list of tags that apply to one or more of a user's favorites.
@@ -324,6 +369,9 @@ async def get_favorites_tagged(
         tag_id: int,
         page: int = 1,
         page_size: int = 20,
+        current_user: models.AuthUser = Depends(  # pylint: disable=unused-argument
+            get_current_active_user
+        )
 ):
     '''
     Get a list of favorites that have this particular tag.
@@ -335,6 +383,9 @@ async def get_favorites_tagged(
 async def get_notes_favorite(
         user_id: str,
         tweet_id: str,
+        current_user: models.AuthUser = Depends(  # pylint: disable=unused-argument
+            get_current_active_user
+        )
 ):
     '''
     Get a list of notes on a particular tweet.
@@ -346,7 +397,10 @@ async def get_notes_favorite(
 async def add_note_favorite(
         user_id: str,
         tweet_id: str,
-        note: models.AddText
+        note: models.AddText,
+        current_user: models.AuthUser = Depends(  # pylint: disable=unused-argument
+            get_current_active_user
+        )
 ):
     '''
     Add a note to a user's timeline tweet.
@@ -358,7 +412,10 @@ async def add_note_favorite(
 async def remove_note_favorite(
         user_id: str,
         tweet_id: str,
-        note_id: str
+        note_id: str,
+        current_user: models.AuthUser = Depends(  # pylint: disable=unused-argument
+            get_current_active_user
+        )
 ):
     '''
     Delete a note from user's timeline tweet.
@@ -369,7 +426,10 @@ async def remove_note_favorite(
 @CECIL.get("/users/{user_id}/favorites/{tweet_id}/tags/", response_model=List[models.Tag])
 async def get_tags_favorite(
         user_id: str,
-        tweet_id: str
+        tweet_id: str,
+        current_user: models.AuthUser = Depends(  # pylint: disable=unused-argument
+            get_current_active_user
+        )
 ):
     '''
     Get the tags on a particular tweet.
@@ -381,7 +441,10 @@ async def get_tags_favorite(
 async def add_tag_favorite(
         user_id: str,
         tweet_id: str,
-        tag: models.AddText
+        tag: models.AddText,
+        current_user: models.AuthUser = Depends(  # pylint: disable=unused-argument
+            get_current_active_user
+        )
 ):
     '''
     Add a tag to a user's timeline tweet.
@@ -393,7 +456,10 @@ async def add_tag_favorite(
 async def remove_tag_favorite(
         user_id: str,
         tweet_id: str,
-        tag_id: str
+        tag_id: str,
+        current_user: models.AuthUser = Depends(  # pylint: disable=unused-argument
+            get_current_active_user
+        )
 ):
     '''
     Delete a tag from user's timeline tweet.
@@ -407,6 +473,9 @@ async def get_followers(
         page: int = 1,
         page_size: int = 1500,
         watchlist_id: str = None,
+        current_user: models.AuthUser = Depends(  # pylint: disable=unused-argument
+            get_current_active_user
+        )
 ):
     '''
     Get a user's followers.
@@ -419,7 +488,10 @@ async def get_friends(
         user_id: str,
         page: int = 1,
         page_size: int = 1500,
-        watchlist_id: str = None
+        watchlist_id: str = None,
+        current_user: models.AuthUser = Depends(  # pylint: disable=unused-argument
+            get_current_active_user
+        )
 ):
     '''
     Get a user's friends.
@@ -436,7 +508,14 @@ async def get_friends(
 
 
 @CECIL.get("/users/{user_id}/notes/", response_model=models.PaginateUserNotes)
-async def get_notes_user(user_id: str, page: int = 1, page_size: int = 20):
+async def get_notes_user(
+        user_id: str,
+        page: int = 1,
+        page_size: int = 20,
+        current_user: models.AuthUser = Depends(  # pylint: disable=unused-argument
+            get_current_active_user
+        )
+):
     '''
     Get the notes about a user.
     '''
@@ -444,7 +523,13 @@ async def get_notes_user(user_id: str, page: int = 1, page_size: int = 20):
 
 
 @CECIL.post("/users/{user_id}/notes/")
-async def add_note_user(user_id: str, note: models.AddText):
+async def add_note_user(
+        user_id: str,
+        note: models.AddText,
+        current_user: models.AuthUser = Depends(  # pylint: disable=unused-argument
+            get_current_active_user
+        )
+):
     '''
     Add a note to a user's file.
     '''
@@ -452,7 +537,13 @@ async def add_note_user(user_id: str, note: models.AddText):
 
 
 @CECIL.delete("/users/{user_id}/notes/{note_id}")
-async def remove_note_user(user_id: str, note_id: str):
+async def remove_note_user(
+        user_id: str,
+        note_id: str,
+        current_user: models.AuthUser = Depends(  # pylint: disable=unused-argument
+            get_current_active_user
+        )
+):
     '''
     Remove a note from a user's file.
     '''
@@ -460,7 +551,13 @@ async def remove_note_user(user_id: str, note_id: str):
 
 
 @CECIL.get("/users/{user_id}/stats/{watchlist_id}", response_model=models.UserStats)
-async def get_stats(user_id: str, watchlist_id: str):
+async def get_stats(
+        user_id: str,
+        watchlist_id: str,
+        current_user: models.AuthUser = Depends(  # pylint: disable=unused-argument
+            get_current_active_user
+        )
+):
     '''
     Get a user's friends.
     '''
@@ -479,7 +576,10 @@ async def get_timeline(
         page: int = 1,
         page_size: int = 20,
         watchlist_id: str = None,
-        watchwords_id: str = None
+        watchwords_id: str = None,
+        current_user: models.AuthUser = Depends(  # pylint: disable=unused-argument
+            get_current_active_user
+        )
 ):
     '''
     Get a user's timeline.
@@ -496,7 +596,10 @@ async def get_timeline(
 
 @CECIL.get("/users/{user_id}/timeline/tags/")
 async def get_tags_timelines(
-        user_id: str
+        user_id: str,
+        current_user: models.AuthUser = Depends(  # pylint: disable=unused-argument
+            get_current_active_user
+        )
 ):
     '''
     Get a timeline's tags.
@@ -509,7 +612,10 @@ async def get_timeline_tagged(
         user_id: str,
         tag_id: str,
         page: int = 1,
-        page_size: int = 20
+        page_size: int = 20,
+        current_user: models.AuthUser = Depends(  # pylint: disable=unused-argument
+            get_current_active_user
+        )
 ):
     '''
     Get timelines tagged.
@@ -521,6 +627,9 @@ async def get_timeline_tagged(
 async def get_notes_timeline(
         user_id: str,
         tweet_id: str,
+        current_user: models.AuthUser = Depends(  # pylint: disable=unused-argument
+            get_current_active_user
+        )
 ):
     '''
     Get timeline tweet notes.
@@ -532,7 +641,10 @@ async def get_notes_timeline(
 async def add_note_timeline(
         user_id: str,
         tweet_id: str,
-        note: models.AddText
+        note: models.AddText,
+        current_user: models.AuthUser = Depends(  # pylint: disable=unused-argument
+            get_current_active_user
+        )
 ):
     '''
     Add a note to a user's timeline tweet.
@@ -544,7 +656,10 @@ async def add_note_timeline(
 async def remove_note_timeline(
         user_id: str,
         tweet_id: str,
-        note_id: str
+        note_id: str,
+        current_user: models.AuthUser = Depends(  # pylint: disable=unused-argument
+            get_current_active_user
+        )
 ):
     '''
     Delete a note from user's timeline tweet.
@@ -556,6 +671,9 @@ async def remove_note_timeline(
 async def get_tags_timeline(
         user_id: str,
         tweet_id: str,
+        current_user: models.AuthUser = Depends(  # pylint: disable=unused-argument
+            get_current_active_user
+        )
 ):
     '''
     Get the tags on a timeline tweet.
@@ -567,7 +685,10 @@ async def get_tags_timeline(
 async def add_tag_timeline(
         user_id: str,
         tweet_id: str,
-        tag: models.AddText
+        tag: models.AddText,
+        current_user: models.AuthUser = Depends(  # pylint: disable=unused-argument
+            get_current_active_user
+        )
 ):
     '''
     Add a tag to a user's timeline tweet.
@@ -579,7 +700,10 @@ async def add_tag_timeline(
 async def remove_tag_timeline(
         user_id: str,
         tweet_id: str,
-        tag_id: str
+        tag_id: str,
+        current_user: models.AuthUser = Depends(  # pylint: disable=unused-argument
+            get_current_active_user
+        )
 ):
     '''
     Delete a tag from user's timeline tweet.
@@ -588,7 +712,11 @@ async def remove_tag_timeline(
 
 
 @CECIL.get("/watchlists/", response_model=List[str])
-async def get_watchlists():
+async def get_watchlists(
+        current_user: models.AuthUser = Depends(  # pylint: disable=unused-argument
+            get_current_active_user
+        )
+):
     '''
     Get a list of watchlists in the watchlist directory.
     '''
@@ -597,7 +725,10 @@ async def get_watchlists():
 
 @CECIL.post("/watchlists/")
 async def add_watchlist(
-        watchlist: models.AddWatchlist
+        watchlist: models.AddWatchlist,
+        current_user: models.AuthUser = Depends(  # pylint: disable=unused-argument
+            get_current_active_user
+        )
 ):
     '''
     Create a watchlist.
@@ -606,7 +737,12 @@ async def add_watchlist(
 
 
 @CECIL.get("/watchlists/{watchlist_name}", response_model=models.WatchlistInfo)
-async def get_watchlist(watchlist_name: str):
+async def get_watchlist(
+        watchlist_name: str,
+        current_user: models.AuthUser = Depends(  # pylint: disable=unused-argument
+            get_current_active_user
+        )
+):
     '''
     Get top level details of a watchlist.
     '''
@@ -620,7 +756,12 @@ async def get_watchlist(watchlist_name: str):
 
 
 @CECIL.get("/watchlists/{watchlist_name}/users/", response_model=List[models.User])
-async def get_watchlist_users(watchlist_name: str):
+async def get_watchlist_users(
+        watchlist_name: str,
+        current_user: models.AuthUser = Depends(  # pylint: disable=unused-argument
+            get_current_active_user
+        )
+):
     '''
     Get users on the watchlist.
     '''
@@ -634,7 +775,13 @@ async def get_watchlist_users(watchlist_name: str):
 
 
 @CECIL.post("/watchlists/{watchlist_name}/users/")
-async def add_watchlist_users(watchlist_name: str, user: models.AddUser):
+async def add_watchlist_users(
+        watchlist_name: str,
+        user: models.AddUser,
+        current_user: models.AuthUser = Depends(  # pylint: disable=unused-argument
+            get_current_active_user
+        )
+):
     '''
     Add user to the watchlist.
     '''
@@ -642,11 +789,18 @@ async def add_watchlist_users(watchlist_name: str, user: models.AddUser):
         control.add_watchlist(watchlist_name, user.user_id)
     except FileNotFoundError:
         raise HTTPException(
-            status_code=404, detail=f'Watchlist, {watchlist_name}, does not exist.')
+            status_code=404,
+            detail=f'Watchlist, {watchlist_name}, does not exist.'
+        )
 
 
 @CECIL.get("/watchlists/{watchlist_name}/words/", response_model=List[str])
-async def get_watchwords(watchlist_name: str):
+async def get_watchwords(
+        watchlist_name: str,
+        current_user: models.AuthUser = Depends(  # pylint: disable=unused-argument
+            get_current_active_user
+        )
+):
     '''
     Get watchwords.
     '''
@@ -660,7 +814,13 @@ async def get_watchwords(watchlist_name: str):
 
 
 @CECIL.post("/watchlists/{watchlist_name}/words/")
-async def add_watchword(watchlist_name: str, watchword: models.AddText):
+async def add_watchword(
+        watchlist_name: str,
+        watchword: models.AddText,
+        current_user: models.AuthUser = Depends(  # pylint: disable=unused-argument
+            get_current_active_user
+        )
+):
     '''
     Add a search term to the watchwords.
     '''
