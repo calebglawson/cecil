@@ -6,6 +6,76 @@ from datetime import datetime
 from pydantic import BaseModel
 
 
+class InviteCode(BaseModel):
+    '''
+    Used for listing invite codes, without revealing the actual codes.
+    '''
+    invite_id: int
+    expires_at: datetime
+    created_by: int
+    created_at: datetime
+
+    class Config:
+        '''Accept SQLAlchemy objects.'''
+        orm_mode = True
+
+
+class UpdatePassword(BaseModel):
+    '''
+    Form for updating password.
+    '''
+    old_password: str
+    new_password: str
+    confirm_new_password: str
+
+
+class RegistrationData(BaseModel):
+    '''
+    Information needed for signup.
+    '''
+    username: str
+    password: str
+    invite_code: str
+
+
+class Token(BaseModel):
+    '''
+    Token for login.
+    '''
+    access_token: str
+    token_type: str
+
+
+class TokenData(BaseModel):
+    '''
+    Token data.
+    '''
+    username: str = None
+
+
+class AuthUser(BaseModel):
+    '''
+    Authenticated user.
+    '''
+    user_id: int
+    username: str
+    role: int
+    invited_by: int = None
+    created_at: datetime
+    last_login: datetime = None
+
+    class Config:
+        '''Accept SQLAlchemy objects.'''
+        orm_mode = True
+
+
+class AuthUserInDB(AuthUser):
+    '''
+    Authenticated user's hashed password.
+    '''
+    hashed_password: str
+
+
 class Paginate(BaseModel):
     '''
     Base class for methods returning sqlalchemy paginate objects.
