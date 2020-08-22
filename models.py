@@ -15,6 +15,19 @@ class InviteCode(BaseModel):
     created_by: int
     created_at: datetime
 
+    class Config:
+        '''Accept SQLAlchemy objects.'''
+        orm_mode = True
+
+
+class UpdatePassword(BaseModel):
+    '''
+    Form for updating password.
+    '''
+    old_password: str
+    new_password: str
+    confirm_new_password: str
+
 
 class RegistrationData(BaseModel):
     '''
@@ -47,9 +60,9 @@ class AuthUser(BaseModel):
     user_id: int
     username: str
     role: int
-    invited_by: int
+    invited_by: int = None
     created_at: datetime
-    last_login: datetime
+    last_login: datetime = None
 
     class Config:
         '''Accept SQLAlchemy objects.'''

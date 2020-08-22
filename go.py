@@ -71,7 +71,7 @@ def _make_conn():
         autocommit=False, autoflush=False, bind=engine)()
 
     if not database.exists():
-        _init_db(datetime, engine, session)
+        _init_db(database, engine, session)
 
     return session
 
@@ -175,6 +175,84 @@ CONN = _make_conn()
 # CECIL USER OPERATIONS
 
 
+@CECIL.get("/admin/invite_codes/", response_model=List[models.InviteCode])
+async def get_invite_codes(
+        current_user: models.AuthUser = Depends(  # pylint: disable=unused-argument
+            get_current_admin_user
+        )
+):
+    '''
+    List the created invite codes.
+    '''
+    return CONN.query(sql_models.InviteCode).all()
+
+
+@CECIL.post("/admin/invite_codes/")
+async def post_invite_code(
+        invite_c: models.AddText,
+        current_user: models.AuthUser = Depends(get_current_admin_user)
+):
+    '''
+    Generate an invite code to create new users.
+    '''
+    invite_code_hash = PWD_CONTEXT.hash(invite_c.text)
+    created_at = datetime.utcnow()
+    expires_at = created_at + \
+        timedelta(minutes=CONFIG.get(
+            CecilConstants.ACCESS_TOKEN_EXPIRE_MINUTES))
+    invite = sql_models.InviteCode(
+        hashed_invite_code=invite_code_hash,
+        created_at=created_at,
+        created_by=current_user.user_id,
+        expires_at=expires_at,
+    )
+    CONN.add(invite)
+    CONN.commit()
+
+
+@CECIL.get("/admin/users/", response_model=List[models.AuthUser])
+async def get_authusers(
+        current_user=Depends(  # pylint: disable=unused-argument
+            get_current_admin_user)
+):
+    '''
+    Get all cecil users.
+    '''
+    return CONN.query(sql_models.User).all()
+
+
+@CECIL.post("/admin/users/{user_id}/deactivate")
+async def deactivate_user(
+        user_id: int,
+        current_user=Depends(  # pylint: disable=unused-argument
+            get_current_admin_user)
+):
+    '''
+    Deactivate a specific user.
+    '''
+    user = CONN.query(sql_models.User).filter(
+        sql_models.User.user_id == user_id)
+    user.role = CecilConstants.DEACTIVATED_ROLE
+    CONN.commit()
+
+
+@CECIL.delete("/admin/invite_codes/{invite_code_id}")
+async def delete_invite_code(
+        invite_code_id: int,
+        current_user: models.AuthUser = Depends(  # pylint: disable=unused-argument
+            get_current_admin_user
+        )
+):
+    '''
+    Delete an invite code manually.
+    '''
+    invite_code = CONN.query(sql_models.InviteCode).filter(
+        sql_models.InviteCode.invite_id == invite_code_id
+    ).first()
+    CONN.delete(invite_code)
+    CONN.commit()
+
+
 @CECIL.post("/register")
 async def register(registration_data: models.RegistrationData):
     '''
@@ -200,64 +278,6 @@ async def register(registration_data: models.RegistrationData):
         CONN.commit()
 
 
-@CECIL.get("/invite_codes/", response_model=models.InviteCode)
-async def get_invite_codes(
-        current_user: models.AuthUser = Depends(  # pylint: disable=unused-argument
-            get_current_active_user
-        )
-):
-    '''
-    List the created invite codes.
-    '''
-    return CONN.query(sql_models.InviteCode).all()
-
-
-@CECIL.post("/invite_codes/")
-async def post_invite_code(
-        invite_c: models.AddText,
-        current_user: models.AuthUser = Depends(get_current_admin_user)
-):
-    '''
-    Generate an invite code to create new users.
-    '''
-    invite_code_hash = PWD_CONTEXT.hash(invite_c.text)
-    created_at = datetime.utcnow()
-    expires_at = created_at + \
-        timedelta(minutes=CONFIG.get(
-            CecilConstants.ACCESS_TOKEN_EXPIRE_MINUTES))
-    invite = sql_models.InviteCode(
-        hashed_invite_code=invite_code_hash,
-        created_at=created_at,
-        created_by=current_user.user_id,
-        expires_at=expires_at,
-    )
-    CONN.add(invite)
-    CONN.commit()
-
-
-@CECIL.delete("/invite_codes/{invite_code_id}")
-async def delete_invite_code(
-        invite_code_id: int,
-        current_user: models.AuthUser = Depends(  # pylint: disable=unused-argument
-            get_current_admin_user
-        )
-):
-    '''
-    Delete an invite code manually.
-    '''
-    invite_code = CONN.query(sql_models.InviteCode).filter(
-        sql_models.InviteCode.invite_id == invite_code_id
-    ).first()
-    CONN.delete(invite_code)
-    CONN.commit()
-
-# Update password
-
-# List users
-
-# Deactivate user
-
-
 @CECIL.post("/token", response_model=models.Token)
 async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends()):
     '''
@@ -276,6 +296,33 @@ async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(
         data={"sub": user.username}, expires_delta=access_token_expires
     )
     return {"access_token": access_token, "token_type": "bearer"}
+
+
+@CECIL.post("/update_password/")
+async def update_password(
+        update_password_request: models.UpdatePassword,
+        current_user: models.AuthUser = Depends(
+            get_current_active_user
+        )
+):
+    '''
+    Update your password.
+    '''
+    if not update_password_request.new_password == update_password_request.confirm_new_password:
+        raise HTTPException(
+            status_code=400, detail="New password and confirmed password do not match.")
+
+    authuser = authenticate_user(
+        current_user.username, update_password_request.old_password)
+
+    if authuser:
+        user = get_authuser(current_user.username)
+        user.hashed_password = PWD_CONTEXT.hash(
+            update_password_request.new_password)
+        CONN.commit()
+    else:
+        raise HTTPException(
+            status_code=401, detail="Current password does not match.")
 
 # TWITTER OPERATIONS
 
