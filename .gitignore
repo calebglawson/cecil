@@ -2,4 +2,5 @@ __pycache__
 baquet
 users
 watchlists
+secret.json
 *.db
