@@ -29,26 +29,15 @@ def _wl_helper(watchlist_id):
 
 
 def get_users(page, page_size):
-    '''
-    Get a list of users and top level info, paginated.
-    '''
-    directory = Directory()
-    return directory.get_directory(page=page, page_size=page_size)
+    pass
 
 
 def add_user(user_id):
-    '''
-    Add a user.
-    '''
-    User(user_id).get_user()
+    pass
 
 
 def get_user(user_id):
-    '''
-    Get a user's top level info.
-    '''
-    user = _user_helper(user_id)
-    return user.get_user()
+    pass
 
 
 def get_favorites(user_id, page, page_size, watchlist_id, watchwords_id):

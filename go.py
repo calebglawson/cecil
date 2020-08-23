@@ -12,6 +12,11 @@ from passlib.context import CryptContext
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy import create_engine
 
+from os import listdir
+from pathlib import Path
+from baquet.user import Directory, User
+from baquet.watchlist import Watchlist
+
 import sql_models
 import models
 import control
@@ -22,6 +27,27 @@ CECIL = FastAPI()
 
 PWD_CONTEXT = CryptContext(schemes=["bcrypt"], deprecated="auto")
 OAUTH2_SCHEME = OAuth2PasswordBearer(tokenUrl="token")
+
+_WL_PATH = Path("./watchlists")
+
+
+def _exists(directoryname, filename):
+    '''
+    Test existance of a file.
+    '''
+
+    if not Path(f"./{directoryname}/{filename}.db").exists():
+        raise FileNotFoundError
+
+
+def _user_helper(user_id):
+    _exists("users", user_id)
+    return User(user_id)
+
+
+def _wl_helper(watchlist_id):
+    _exists("watchlists", watchlist_id)
+    return Watchlist(watchlist_id)
 
 
 def _make_config():
@@ -338,7 +364,8 @@ async def get_users(
     '''
     Get a list of users and top level info in the user directory.
     '''
-    return control.get_users(page=page, page_size=page_size)
+    directory = Directory()
+    return directory.get_directory(page=page, page_size=page_size)
 
 
 @CECIL.post("/users/")
@@ -351,7 +378,7 @@ async def add_user(
     '''
     Add a user to the directory.
     '''
-    control.add_user(user.user_id)
+    User(user.user_id).get_user()
 
 
 @CECIL.get("/users/{user_id}", response_model=models.User)
@@ -365,12 +392,12 @@ async def get_user(
     Get a user's top level info.
     '''
     try:
-        response = control.get_user(user_id)
+        user = _user_helper(user_id)
     except FileNotFoundError:
         raise HTTPException(
             status_code=404, detail=f'User, {user_id}, does not exist.')
 
-    return response
+    return user.get_user()
 
 
 @CECIL.get("/users/{user_id}/favorites/", response_model=models.PaginateFavorites)
