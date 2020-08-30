@@ -7,3 +7,6 @@ Download and set up dependency, `baquet`. Fill out the sample `config.json` with
 Run `uvicorn go:CECIL`
 
 Swagger docs at `http://localhost:8000/docs`
+
+Admin user default credentials: admin, password
+**Please update your admin user's password.**
