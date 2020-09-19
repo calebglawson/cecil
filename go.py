@@ -428,7 +428,7 @@ async def get_favorites(
     )
 
 
-@CECIL.get("/users/{user_id}/favorites/tags", response_model=json_models.PaginateFavorites)
+@CECIL.get("/users/{user_id}/favorites/tags", response_model=List[json_models.Tag])
 async def get_tags_favorites(
         user_id: str,
         current_user: json_models.AuthUser = Depends(  # pylint: disable=unused-argument
@@ -547,10 +547,10 @@ async def remove_tag_favorite(
         )
 ):
     '''
-    Delete a tag from user's timeline tweet.
+    Delete a tag from user's favorite.
     '''
     user = _user_helper(user_id)
-    user.remove_tag_timeline(tweet_id, tag_id)
+    user.remove_tag_favorite(tweet_id, tag_id)
 
 
 @CECIL.get("/users/{user_id}/followers/", response_model=json_models.PaginateFriendsOrFollowing)
@@ -707,7 +707,7 @@ async def get_tags_timelines(
 @CECIL.get("/users/{user_id}/timeline/tags/{tag_id}")
 async def get_timeline_tagged(
         user_id: str,
-        tag_id: str,
+        tag_id: int,
         page: int = 1,
         page_size: int = 20,
         current_user: json_models.AuthUser = Depends(  # pylint: disable=unused-argument
@@ -892,8 +892,7 @@ async def add_watchlist_users(
     Add user to the watchlist.
     '''
     watchlist = _wl_helper(watchlist_id)
-    user = _user_helper(user.user_id)
-    watchlist.add_watchlist(user)
+    watchlist.add_watchlist(user.user_id)
 
 
 @CECIL.get("/watchlists/{watchlist_id}/words/", response_model=List[str])
@@ -922,4 +921,4 @@ async def add_watchword(
     Add a search term to the watchwords.
     '''
     watchlist = _wl_helper(watchlist_id)
-    watchlist.add_watchword(watchword)
+    watchlist.add_watchword(watchword.text)
