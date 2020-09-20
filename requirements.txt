@@ -1,4 +1,4 @@
-git+git:github.com/calebglawson/baquet@releases/tag/20.8.23#egg=baquet
+git+git:github.com/calebglawson/baquet@releases/tag/20.9.19.1#egg=baquet
 fastapi
 jose
 passlib
