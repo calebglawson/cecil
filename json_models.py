@@ -66,20 +66,20 @@ class User(BaseModel):
     '''
     Twitter user top level data.
     '''
-    contributors_enabled: bool = False
+    contributors_enabled: bool = None
     created_at: datetime = None
-    default_profile: bool = False
-    default_profile_image: bool = False
+    default_profile: bool = None
+    default_profile_image: bool = None
     description: str = None
     entities: dict = None
     favorites_count: int = None
     followers_count: int = None
     friends_count: int = None
-    geo_enabled: bool = False
-    has_extended_profile: bool = False
+    geo_enabled: bool = None
+    has_extended_profile: bool = None
     user_id: str
-    is_translation_enabled: bool = False
-    is_translator: bool = False
+    is_translation_enabled: bool = None
+    is_translator: bool = None
     lang: str = None
     listed_count: int = None
     location: str = None
@@ -92,7 +92,7 @@ class User(BaseModel):
     statuses_count: int = None
     suspended: bool = None
     url: str = None
-    verified: bool = False
+    verified: bool = None
     last_updated: datetime = None
 
     class Config:
@@ -303,3 +303,53 @@ class PaginateUserNotes(Paginate):
     Paginate user notes.
     '''
     items: List[UserNote]
+
+
+class ImportBlockbotList(BaseModel):
+    '''
+    Details needed to import a Twitter list.
+    '''
+    blockbot_id: str
+    name: str
+
+    class Config:
+        '''Accept SQLAlchemy objects.'''
+        orm_mode = True
+
+
+class ImportTwitterList(BaseModel):
+    '''
+    Details needed to import a Twitter list.
+    '''
+    twitter_id: str = None
+    slug: str = None
+    owner_screen_name: str = None
+
+    class Config:
+        '''Accept SQLAlchemy objects.'''
+        orm_mode = True
+
+
+class ExcludeUser(BaseModel):
+    '''
+    Whether or not to exclude a user.
+    '''
+    excluded: bool
+
+    class Config:
+        '''Accept SQLAlchemy objects.'''
+        orm_mode = True
+
+
+class Sublist(BaseModel):
+    '''
+    Details to view a sublist.
+    '''
+    sublist_id: int
+    sublist_type_id: int
+    name: str
+    external_id: str = None
+
+    class Config:
+        '''Accept SQLAlchemy objects.'''
+        orm_mode = True

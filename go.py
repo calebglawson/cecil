@@ -880,6 +880,145 @@ async def get_watchlist_users(
     return watchlist.get_watchlist_users()
 
 
+@CECIL.post("/watchlists/{watchlist_id/import/blockbot/")
+async def import_blockbot_list(
+        watchlist_id: str,
+        import_details: json_models.ImportBlockbotList,
+        current_user: json_models.AuthUser = Depends(  # pylint: disable=unused-argument
+            get_current_active_user
+        )
+):
+    '''
+    Import a blockbot list.
+    '''
+    watchlist = _wl_helper(watchlist_id)
+    watchlist.import_blockbot_list(
+        import_details.blockbot_id,
+        import_details.name
+    )
+
+
+@CECIL.post("/watchlists/{watchlist_id}/import/twitter/")
+async def import_twitter_list(
+        watchlist_id: str,
+        import_details: json_models.ImportTwitterList,
+        current_user: json_models.AuthUser = Depends(  # pylint: disable=unused-argument
+            get_current_active_user
+        )
+):
+    '''
+    Import a twitter list.
+    '''
+    watchlist = _wl_helper(watchlist_id)
+
+    if import_details.twitter_id:
+        import_details.slug = None
+        import_details.owner_screen_name = None
+
+    watchlist.import_twitter_list(
+        twitter_id=import_details.twitter_id,
+        slug=import_details.slug,
+        owner_screen_name=import_details.owner_screen_name
+    )
+
+
+@CECIL.get("/watchlists/{watchlist_id}/sublists/", response_model=List[json_models.Sublist])
+async def get_sublists(
+        watchlist_id: str,
+        current_user: json_models.AuthUser = Depends(  # pylint: disable=unused-argument
+            get_current_active_user
+        )
+):
+    '''
+    Get a list of the sublists.
+    '''
+    watchlist = _wl_helper(watchlist_id)
+    return watchlist.get_sublists()
+
+
+@CECIL.get("/watchlists/{watchlist_id}/sublists/{sublist_id}/users/", response_model=List[json_models.User])
+async def get_sublist_users(
+        watchlist_id: str,
+        sublist_id: str,
+        current_user: json_models.AuthUser = Depends(  # pylint: disable=unused-argument
+            get_current_active_user
+        )
+):
+    '''
+    Get the users in the sublist.
+    '''
+    watchlist = _wl_helper(watchlist_id)
+    return watchlist.get_sublist_users(sublist_id)
+
+
+@CECIL.post("/watchlists/{watchlist_id}/sublists/{sublist_id}/refresh/")
+async def refresh_sublist(
+        watchlist_id: str,
+        sublist_id: str,
+        current_user: json_models.AuthUser = Depends(  # pylint: disable=unused-argument
+            get_current_active_user
+        )
+):
+    '''
+    Refresh a sublist.
+    '''
+    watchlist = _wl_helper(watchlist_id)
+    watchlist.refresh_sublist(sublist_id)
+
+
+@CECIL.delete("/watchlists/{watchlist_id}/sublists/{sublist_id}")
+async def remove_sublist(
+        watchlist_id: str,
+        sublist_id: str,
+        current_user: json_models.AuthUser = Depends(  # pylint: disable=unused-argument
+            get_current_active_user
+        )
+):
+    '''
+    Remove a sublist.
+    '''
+    watchlist = _wl_helper(watchlist_id)
+    watchlist.remove_sublist(sublist_id)
+
+
+@CECIL.get(
+    "/watchlists/{watchlist_id}/sublists/{sublist_id}/exclusions/",
+    response_model=List[json_models.User]
+)
+async def get_sublist_exclusions(
+        watchlist_id: str,
+        sublist_id: str,
+        current_user: json_models.AuthUser = Depends(  # pylint: disable=unused-argument
+            get_current_active_user
+        )
+):
+    '''
+    '''
+    watchlist = _wl_helper(watchlist_id)
+    return watchlist.get_sublist_user_exclusions(sublist_id)
+
+
+@CECIL.post("/watchlists/{watchlist_id}/sublist/{sublist_id}/exclusions/{user_id}")
+async def set_exclusion_status(
+        watchlist_id: str,
+        sublist_id: str,
+        user_id: str,
+        exclusion_details: json_models.ExcludeUser,
+        current_user: json_models.AuthUser = Depends(  # pylint: disable=unused-argument
+            get_current_active_user
+        )
+):
+    '''
+    Set the exclusion status of a user from a particular sublist.
+    '''
+    watchlist = _wl_helper(watchlist_id)
+    watchlist.set_user_sublist_exclusion_status(
+        user_id,
+        sublist_id,
+        exclusion_details.excluded
+    )
+
+
 @CECIL.post("/watchlists/{watchlist_id}/users/")
 async def add_watchlist_users(
         watchlist_id: str,
@@ -893,6 +1032,21 @@ async def add_watchlist_users(
     '''
     watchlist = _wl_helper(watchlist_id)
     watchlist.add_watchlist(user.user_id)
+
+
+@CECIL.delete("/watchlists/{watchlist_id}/users/{user_id}")
+async def remove_watchlist_user(
+        watchlist_id: str,
+        user_id: str,
+        current_user: json_models.AuthUser = Depends(  # pylint: disable=unused-argument
+            get_current_active_user
+        )
+):
+    '''
+    Remove a user from the watchlist.
+    '''
+    watchlist = _wl_helper(watchlist_id)
+    watchlist.remove_watchlist(user_id)
 
 
 @CECIL.get("/watchlists/{watchlist_id}/words/", response_model=List[str])
@@ -922,3 +1076,18 @@ async def add_watchword(
     '''
     watchlist = _wl_helper(watchlist_id)
     watchlist.add_watchword(watchword.text)
+
+
+@CECIL.delete("/watchlists/{watchlist_id}/words/")
+async def remove_watchword(
+        watchlist_id: str,
+        watchword: json_models.AddText,
+        current_user: json_models.AuthUser = Depends(  # pylint: disable=unused-argument
+            get_current_active_user
+        )
+):
+    '''
+    Remove a watchword from the list.
+    '''
+    watchlist = _wl_helper(watchlist_id)
+    watchlist.remove_watchword(watchword.text)
