@@ -2,6 +2,7 @@
 Cecil, it all starts here.
 '''
 import json
+from contextlib import contextmanager
 from os import listdir
 from datetime import datetime, timedelta
 from typing import List
@@ -10,7 +11,7 @@ from fastapi import FastAPI, HTTPException, Depends
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from jose import JWTError, jwt
 from passlib.context import CryptContext
-from sqlalchemy.orm import sessionmaker
+from sqlalchemy.orm import sessionmaker, scoped_session
 from sqlalchemy import create_engine
 
 from baquet.user import Directory, User
@@ -97,8 +98,11 @@ def _make_conn():
     database = Path(f'./cecil.db')
     engine = create_engine(
         f'sqlite:///{database}', connect_args={"check_same_thread": False})
-    session = sessionmaker(
-        autocommit=False, autoflush=False, bind=engine)()
+    session_factory = sessionmaker(
+        autocommit=False, autoflush=False, bind=engine)
+    session = scoped_session(
+        session_factory
+    )
 
     if not database.exists():
         _init_db(database, engine, session)
@@ -124,7 +128,8 @@ def get_authuser(username: str):
     '''
     Get the user from the cecil DB for authentication.
     '''
-    return CONN.query(orm_models.User).filter(orm_models.User.username == username).first()
+    with sess() as session:
+        return session.query(orm_models.User).filter(orm_models.User.username == username).first()
 
 
 def authenticate_user(username: str, password: str):
@@ -204,6 +209,21 @@ async def get_current_admin_user(
 CONFIG = _make_config()
 CONN = _make_conn()
 
+
+@contextmanager
+def sess():
+    '''
+    Make a managed DB to use with user management.
+    '''
+    session = CONN()
+    try:
+        yield session
+    except:
+        session.rollback()
+        raise
+    finally:
+        session.close()
+
 # CECIL USER OPERATIONS
 
 
@@ -216,7 +236,8 @@ async def get_invite_codes(
     '''
     List the created invite codes.
     '''
-    return CONN.query(orm_models.InviteCode).all()
+    with sess() as session:
+        return session.query(orm_models.InviteCode).all()
 
 
 @CECIL.post("/admin/invite_codes/")
@@ -238,8 +259,9 @@ async def post_invite_code(
         created_by=current_user.user_id,
         expires_at=expires_at,
     )
-    CONN.add(invite)
-    CONN.commit()
+    with sess() as session:
+        session.add(invite)
+        session.commit()
 
 
 @CECIL.get("/admin/users/", response_model=List[json_models.AuthUser])
@@ -250,7 +272,8 @@ async def get_authusers(
     '''
     Get all cecil users.
     '''
-    return CONN.query(orm_models.User).all()
+    with sess() as session:
+        return session.query(orm_models.User).all()
 
 
 @CECIL.post("/admin/users/{user_id}/deactivate")
@@ -262,10 +285,11 @@ async def deactivate_user(
     '''
     Deactivate a specific user.
     '''
-    user = CONN.query(orm_models.User).filter(
-        orm_models.User.user_id == user_id)
-    user.role = CecilConstants.DEACTIVATED_ROLE
-    CONN.commit()
+    with sess() as session:
+        user = session.query(orm_models.User).filter(
+            orm_models.User.user_id == user_id)
+        user.role = CecilConstants.DEACTIVATED_ROLE
+        session.commit()
 
 
 @CECIL.delete("/admin/invite_codes/{invite_code_id}")
@@ -278,11 +302,12 @@ async def delete_invite_code(
     '''
     Delete an invite code manually.
     '''
-    invite_code = CONN.query(orm_models.InviteCode).filter(
-        orm_models.InviteCode.invite_id == invite_code_id
-    ).first()
-    CONN.delete(invite_code)
-    CONN.commit()
+    with sess() as session:
+        invite_code = session.query(orm_models.InviteCode).filter(
+            orm_models.InviteCode.invite_id == invite_code_id
+        ).first()
+        session.delete(invite_code)
+        session.commit()
 
 
 @CECIL.post("/register")
@@ -290,24 +315,25 @@ async def register(registration_data: json_models.RegistrationData):
     '''
     Register with an invite code.
     '''
-    invite_codes = CONN.query(orm_models.InviteCode).all()
-    invited = False
-    for invite in invite_codes:
-        if verify_password(registration_data.invite_code, invite.hashed_invite_code):
-            invited = True
-            chosen = invite
+    with sess() as session:
+        invite_codes = session.query(orm_models.InviteCode).all()
+        invited = False
+        for invite in invite_codes:
+            if verify_password(registration_data.invite_code, invite.hashed_invite_code):
+                invited = True
+                chosen = invite
 
-    if invited:
-        new_user = orm_models.User(
-            username=registration_data.username,
-            hashed_password=get_password_hash(registration_data.password),
-            role=CecilConstants.NON_PRIVILEGED_ROLE,
-            invited_by=chosen.created_by,
-            created_at=datetime.utcnow(),
-        )
-        CONN.add(new_user)
-        CONN.delete(chosen)
-        CONN.commit()
+        if invited:
+            new_user = orm_models.User(
+                username=registration_data.username,
+                hashed_password=get_password_hash(registration_data.password),
+                role=CecilConstants.NON_PRIVILEGED_ROLE,
+                invited_by=chosen.created_by,
+                created_at=datetime.utcnow(),
+            )
+            session.add(new_user)
+            session.delete(chosen)
+            session.commit()
 
 
 @CECIL.post("/token", response_model=json_models.Token)
@@ -348,10 +374,13 @@ async def update_password(
         current_user.username, update_password_request.old_password)
 
     if authuser:
-        user = get_authuser(current_user.username)
-        user.hashed_password = PWD_CONTEXT.hash(
-            update_password_request.new_password)
-        CONN.commit()
+        with sess() as session:
+            user = get_authuser(current_user.username)
+            user.hashed_password = PWD_CONTEXT.hash(
+                update_password_request.new_password
+            )
+            session.merge(user)
+            session.commit()
     else:
         raise HTTPException(
             status_code=401, detail="Current password does not match.")
@@ -936,7 +965,10 @@ async def get_sublists(
     return watchlist.get_sublists()
 
 
-@CECIL.get("/watchlists/{watchlist_id}/sublists/{sublist_id}/users/", response_model=List[json_models.User])
+@CECIL.get(
+    "/watchlists/{watchlist_id}/sublists/{sublist_id}/users/",
+    response_model=List[json_models.User]
+)
 async def get_sublist_users(
         watchlist_id: str,
         sublist_id: str,
@@ -993,6 +1025,7 @@ async def get_sublist_exclusions(
         )
 ):
     '''
+    Get users that are excluded internally.
     '''
     watchlist = _wl_helper(watchlist_id)
     return watchlist.get_sublist_user_exclusions(sublist_id)
