@@ -15,7 +15,7 @@ from constants import CecilConstants
 ROUTER = APIRouter()
 
 
-@ROUTER.get("/admin/invite_codes/", response_model=List[json_models.InviteCode])
+@ROUTER.get("/invite_codes/", response_model=List[json_models.InviteCode])
 def get_invite_codes():
     '''
     List the created invite codes.
@@ -24,7 +24,7 @@ def get_invite_codes():
         return session.query(orm_models.InviteCode).all()
 
 
-@ROUTER.post("/admin/invite_codes/")
+@ROUTER.post("/invite_codes/")
 def post_invite_code(
         invite_c: json_models.AddText,
         current_user: json_models.AuthUser = Depends(
@@ -49,7 +49,7 @@ def post_invite_code(
         session.commit()
 
 
-@ROUTER.get("/admin/users/", response_model=List[json_models.AuthUser])
+@ROUTER.get("/users/", response_model=List[json_models.AuthUser])
 def get_authusers():
     '''
     Get all ROUTER users.
@@ -58,7 +58,7 @@ def get_authusers():
         return session.query(orm_models.User).all()
 
 
-@ROUTER.post("/admin/users/{user_id}/deactivate")
+@ROUTER.post("/users/{user_id}/deactivate")
 def deactivate_user(user_id: int):
     '''
     Deactivate a specific user.
@@ -70,7 +70,7 @@ def deactivate_user(user_id: int):
         session.commit()
 
 
-@ROUTER.delete("/admin/invite_codes/{invite_code_id}")
+@ROUTER.delete("/invite_codes/{invite_code_id}")
 def delete_invite_code(invite_code_id: int):
     '''
     Delete an invite code manually.
