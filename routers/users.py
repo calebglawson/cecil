@@ -13,7 +13,7 @@ ROUTER = APIRouter()
 
 
 @ROUTER.get("/", response_model=json_models.PaginateUser)
-async def get_users(
+def get_users(
         page: int = 1,
         page_size: int = 20,
 ):
@@ -25,7 +25,7 @@ async def get_users(
 
 
 @ROUTER.post("/")
-async def add_user(
+def add_user(
         user: json_models.AddUser,
 ):
     '''
@@ -35,7 +35,7 @@ async def add_user(
 
 
 @ROUTER.get("/{user_id}/", response_model=json_models.User)
-async def get_user(
+def get_user(
         user_id: str,
 ):
     '''
@@ -46,7 +46,7 @@ async def get_user(
 
 
 @ROUTER.get("/{user_id}/favorites/", response_model=json_models.PaginateFavorites)
-async def get_favorites(
+def get_favorites(
         user_id: str,
         page: int = 1,
         page_size: int = 20,
@@ -70,7 +70,7 @@ async def get_favorites(
 
 
 @ROUTER.get("/{user_id}/favorites/tags/", response_model=List[json_models.Tag])
-async def get_tags_favorites(
+def get_tags_favorites(
         user_id: str,
 ):
     '''
@@ -81,7 +81,7 @@ async def get_tags_favorites(
 
 
 @ROUTER.get("/{user_id}/favorites/tags/{tag_id}/", response_model=json_models.PaginateFavorites)
-async def get_favorites_tagged(
+def get_favorites_tagged(
         user_id: str,
         tag_id: int,
         page: int = 1,
@@ -95,7 +95,7 @@ async def get_favorites_tagged(
 
 
 @ROUTER.get("/{user_id}/favorites/{tweet_id}/notes/")
-async def get_notes_favorite(
+def get_notes_favorite(
         user_id: str,
         tweet_id: str,
 ):
@@ -107,7 +107,7 @@ async def get_notes_favorite(
 
 
 @ROUTER.post("/{user_id}/favorites/{tweet_id}/notes/")
-async def add_note_favorite(
+def add_note_favorite(
         user_id: str,
         tweet_id: str,
         note: json_models.AddText,
@@ -120,7 +120,7 @@ async def add_note_favorite(
 
 
 @ROUTER.delete("/{user_id}/favorites/{tweet_id}/notes/{note_id}/")
-async def remove_note_favorite(
+def remove_note_favorite(
         user_id: str,
         tweet_id: str,
         note_id: str,
@@ -133,7 +133,7 @@ async def remove_note_favorite(
 
 
 @ROUTER.get("/{user_id}/favorites/{tweet_id}/tags/", response_model=List[json_models.Tag])
-async def get_tags_favorite(
+def get_tags_favorite(
         user_id: str,
         tweet_id: str,
 ):
@@ -145,7 +145,7 @@ async def get_tags_favorite(
 
 
 @ROUTER.post("/{user_id}/favorites/{tweet_id}/tags/")
-async def add_tag_favorite(
+def add_tag_favorite(
         user_id: str,
         tweet_id: str,
         tag: json_models.AddText,
@@ -158,7 +158,7 @@ async def add_tag_favorite(
 
 
 @ROUTER.delete("/{user_id}/favorites/{tweet_id}/tags/{tag_id}/")
-async def remove_tag_favorite(
+def remove_tag_favorite(
         user_id: str,
         tweet_id: str,
         tag_id: str,
@@ -171,7 +171,7 @@ async def remove_tag_favorite(
 
 
 @ROUTER.get("/{user_id}/followers/", response_model=json_models.PaginateFriendsOrFollowing)
-async def get_followers(
+def get_followers(
         user_id: str,
         page: int = 1,
         page_size: int = 1500,
@@ -189,7 +189,7 @@ async def get_followers(
 
 
 @ROUTER.get("/{user_id}/friends/", response_model=json_models.PaginateFriendsOrFollowing)
-async def get_friends(
+def get_friends(
         user_id: str,
         page: int = 1,
         page_size: int = 1500,
@@ -207,7 +207,7 @@ async def get_friends(
 
 
 @ROUTER.get("/{user_id}/notes/", response_model=json_models.PaginateUserNotes)
-async def get_notes_user(
+def get_notes_user(
         user_id: str,
         page: int = 1,
         page_size: int = 20,
@@ -220,7 +220,7 @@ async def get_notes_user(
 
 
 @ROUTER.post("/{user_id}/notes/")
-async def add_note_user(
+def add_note_user(
         user_id: str,
         note: json_models.AddText,
 ):
@@ -232,7 +232,7 @@ async def add_note_user(
 
 
 @ROUTER.delete("/{user_id}/notes/{note_id}/")
-async def remove_note_user(
+def remove_note_user(
         user_id: str,
         note_id: str,
 ):
@@ -244,7 +244,7 @@ async def remove_note_user(
 
 
 @ROUTER.get("/{user_id}/stats/{watchlist_id}/", response_model=json_models.UserStats)
-async def get_stats(
+def get_stats(
         user_id: str,
         watchlist_id: str,
 ):
@@ -266,7 +266,7 @@ async def get_stats(
 
 
 @ROUTER.get("/{user_id}/timeline/", response_model=json_models.PaginateTimeline)
-async def get_timeline(
+def get_timeline(
         user_id: str,
         page: int = 1,
         page_size: int = 20,
@@ -287,7 +287,7 @@ async def get_timeline(
 
 
 @ROUTER.get("/{user_id}/timeline/tags/")
-async def get_tags_timelines(
+def get_tags_timelines(
         user_id: str,
 ):
     '''
@@ -298,7 +298,7 @@ async def get_tags_timelines(
 
 
 @ROUTER.get("/{user_id}/timeline/tags/{tag_id}/")
-async def get_timeline_tagged(
+def get_timeline_tagged(
         user_id: str,
         tag_id: int,
         page: int = 1,
@@ -312,7 +312,7 @@ async def get_timeline_tagged(
 
 
 @ROUTER.get("/{user_id}/timeline/{tweet_id}/notes/")
-async def get_notes_timeline(
+def get_notes_timeline(
         user_id: str,
         tweet_id: str,
 ):
@@ -324,7 +324,7 @@ async def get_notes_timeline(
 
 
 @ROUTER.post("/{user_id}/timeline/{tweet_id}/notes/")
-async def add_note_timeline(
+def add_note_timeline(
         user_id: str,
         tweet_id: str,
         note: json_models.AddText,
@@ -337,7 +337,7 @@ async def add_note_timeline(
 
 
 @ROUTER.delete("/{user_id}/timeline/{tweet_id}/notes/{note_id}/")
-async def remove_note_timeline(
+def remove_note_timeline(
         user_id: str,
         tweet_id: str,
         note_id: str,
@@ -350,7 +350,7 @@ async def remove_note_timeline(
 
 
 @ROUTER.get("/{user_id}/timeline/{tweet_id}/tags/", response_model=List[json_models.Tag])
-async def get_tags_timeline(
+def get_tags_timeline(
         user_id: str,
         tweet_id: str,
 ):
@@ -362,7 +362,7 @@ async def get_tags_timeline(
 
 
 @ROUTER.post("/{user_id}/timeline/{tweet_id}/tags/")
-async def add_tag_timeline(
+def add_tag_timeline(
         user_id: str,
         tweet_id: str,
         tag: json_models.AddText,
@@ -375,7 +375,7 @@ async def add_tag_timeline(
 
 
 @ROUTER.delete("/{user_id}/timeline/{tweet_id}/tags/{tag_id}/")
-async def remove_tag_timeline(
+def remove_tag_timeline(
         user_id: str,
         tweet_id: str,
         tag_id: str,

@@ -14,7 +14,7 @@ ROUTER = APIRouter()
 
 
 @ROUTER.get("/", response_model=List[str])
-async def get_watchlists():
+def get_watchlists():
     '''
     Get a list of watchlists in the watchlist directory.
     '''
@@ -27,7 +27,7 @@ async def get_watchlists():
 
 
 @ROUTER.post("/")
-async def add_watchlist(
+def add_watchlist(
         watchlist: json_models.AddWatchlist,
 ):
     '''
@@ -37,7 +37,7 @@ async def add_watchlist(
 
 
 @ROUTER.get("/{watchlist_id}", response_model=json_models.WatchlistInfo)
-async def get_watchlist(
+def get_watchlist(
         watchlist_id: str,
 ):
     '''
@@ -53,7 +53,7 @@ async def get_watchlist(
 
 
 @ROUTER.get("/{watchlist_id}/users/", response_model=List[json_models.User])
-async def get_watchlist_users(
+def get_watchlist_users(
         watchlist_id: str,
 ):
     '''
@@ -66,7 +66,7 @@ async def get_watchlist_users(
 
 
 @ROUTER.post("/{watchlist_id/import/blockbot/")
-async def import_blockbot_list(
+def import_blockbot_list(
         watchlist_id: str,
         import_details: json_models.ImportBlockbotList,
 ):
@@ -81,7 +81,7 @@ async def import_blockbot_list(
 
 
 @ROUTER.post("/{watchlist_id}/import/twitter/")
-async def import_twitter_list(
+def import_twitter_list(
         watchlist_id: str,
         import_details: json_models.ImportTwitterList,
 ):
@@ -102,7 +102,7 @@ async def import_twitter_list(
 
 
 @ROUTER.get("/{watchlist_id}/sublists/", response_model=List[json_models.Sublist])
-async def get_sublists(
+def get_sublists(
         watchlist_id: str,
 ):
     '''
@@ -116,7 +116,7 @@ async def get_sublists(
     "/{watchlist_id}/sublists/{sublist_id}/users/",
     response_model=List[json_models.User]
 )
-async def get_sublist_users(
+def get_sublist_users(
         watchlist_id: str,
         sublist_id: str,
 ):
@@ -128,7 +128,7 @@ async def get_sublist_users(
 
 
 @ROUTER.post("/{watchlist_id}/sublists/{sublist_id}/refresh/")
-async def refresh_sublist(
+def refresh_sublist(
         watchlist_id: str,
         sublist_id: str,
 ):
@@ -140,7 +140,7 @@ async def refresh_sublist(
 
 
 @ROUTER.delete("/{watchlist_id}/sublists/{sublist_id}")
-async def remove_sublist(
+def remove_sublist(
         watchlist_id: str,
         sublist_id: str,
 ):
@@ -155,7 +155,7 @@ async def remove_sublist(
     "/{watchlist_id}/sublists/{sublist_id}/exclusions/",
     response_model=List[json_models.User]
 )
-async def get_sublist_exclusions(
+def get_sublist_exclusions(
         watchlist_id: str,
         sublist_id: str,
 ):
@@ -167,7 +167,7 @@ async def get_sublist_exclusions(
 
 
 @ROUTER.post("/{watchlist_id}/sublists/{sublist_id}/exclusions/{user_id}")
-async def set_exclusion_status(
+def set_exclusion_status(
         watchlist_id: str,
         sublist_id: str,
         user_id: str,
@@ -185,7 +185,7 @@ async def set_exclusion_status(
 
 
 @ROUTER.post("/{watchlist_id}/users/")
-async def add_watchlist_users(
+def add_watchlist_users(
         watchlist_id: str,
         user: json_models.AddUser,
 ):
@@ -197,7 +197,7 @@ async def add_watchlist_users(
 
 
 @ROUTER.delete("/{watchlist_id}/users/{user_id}")
-async def remove_watchlist_user(
+def remove_watchlist_user(
         watchlist_id: str,
         user_id: str,
 ):
@@ -209,7 +209,7 @@ async def remove_watchlist_user(
 
 
 @ROUTER.get("/{watchlist_id}/words/", response_model=List[str])
-async def get_watchwords(
+def get_watchwords(
         watchlist_id: str,
 ):
     '''
@@ -220,7 +220,7 @@ async def get_watchwords(
 
 
 @ROUTER.post("/{watchlist_id}/words/")
-async def add_watchword(
+def add_watchword(
         watchlist_id: str,
         watchword: json_models.AddText,
 ):
@@ -232,7 +232,7 @@ async def add_watchword(
 
 
 @ROUTER.delete("/{watchlist_id}/words/")
-async def remove_watchword(
+def remove_watchword(
         watchlist_id: str,
         watchword: json_models.AddText,
 ):

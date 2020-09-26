@@ -14,4 +14,4 @@ class CecilConstants:
     ACCESS_TOKEN_EXPIRE_MINUTES = "access_token_expire_minutes"
     HASHING_ALGORITHM = "HS256"
     WL_PATH = "./watchlists"
-    CONFIG_PATH = ". / config.json"
+    CONFIG_PATH = "./config.json"

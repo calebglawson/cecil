@@ -12,9 +12,11 @@ import internal_users
 from constants import CecilConstants
 from routers import users, watchlists, admin
 
+CECIL = FastAPI()
+
 # INTERNAL USER OPERATIONS
 @CECIL.post("/register")
-async def register(registration_data: json_models.RegistrationData):
+def register(registration_data: json_models.RegistrationData):
     '''
     Register with an invite code.
     '''
@@ -44,7 +46,7 @@ async def register(registration_data: json_models.RegistrationData):
 
 
 @CECIL.post("/token", response_model=json_models.Token)
-async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends()):
+def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends()):
     '''
     Get a token for access after logging in.
     '''
@@ -65,7 +67,7 @@ async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(
 
 
 @CECIL.post("/update_password/")
-async def update_password(
+def update_password(
         update_password_request: json_models.UpdatePassword,
         current_user: json_models.AuthUser = Depends(
             internal_users.get_current_active_user
@@ -93,6 +95,7 @@ async def update_password(
         raise HTTPException(
             status_code=401, detail="Current password does not match.")
 
+
 CECIL.include_router(
     admin.ROUTER,
     prefix="/admin",
@@ -116,5 +119,4 @@ CECIL.include_router(
     dependencies=[Depends(internal_users.get_current_active_user)]
 )
 
-CECIL = FastAPI()
 CONFIG = helpers.make_config()

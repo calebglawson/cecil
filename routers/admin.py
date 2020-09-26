@@ -16,7 +16,7 @@ ROUTER = APIRouter()
 
 
 @ROUTER.get("/admin/invite_codes/", response_model=List[json_models.InviteCode])
-async def get_invite_codes():
+def get_invite_codes():
     '''
     List the created invite codes.
     '''
@@ -25,7 +25,7 @@ async def get_invite_codes():
 
 
 @ROUTER.post("/admin/invite_codes/")
-async def post_invite_code(
+def post_invite_code(
         invite_c: json_models.AddText,
         current_user: json_models.AuthUser = Depends(
             internal_users.get_current_admin_user)
@@ -50,7 +50,7 @@ async def post_invite_code(
 
 
 @ROUTER.get("/admin/users/", response_model=List[json_models.AuthUser])
-async def get_authusers():
+def get_authusers():
     '''
     Get all ROUTER users.
     '''
@@ -59,7 +59,7 @@ async def get_authusers():
 
 
 @ROUTER.post("/admin/users/{user_id}/deactivate")
-async def deactivate_user(user_id: int):
+def deactivate_user(user_id: int):
     '''
     Deactivate a specific user.
     '''
@@ -71,7 +71,7 @@ async def deactivate_user(user_id: int):
 
 
 @ROUTER.delete("/admin/invite_codes/{invite_code_id}")
-async def delete_invite_code(invite_code_id: int):
+def delete_invite_code(invite_code_id: int):
     '''
     Delete an invite code manually.
     '''
@@ -81,5 +81,6 @@ async def delete_invite_code(invite_code_id: int):
         ).first()
         session.delete(invite_code)
         session.commit()
+
 
 CONFIG = helpers.make_config()

@@ -18,6 +18,10 @@ from constants import CecilConstants
 import helpers
 
 
+PWD_CONTEXT = CryptContext(schemes=["bcrypt"], deprecated="auto")
+OAUTH2_SCHEME = OAuth2PasswordBearer(tokenUrl="token")
+
+
 def _init_roles(session):
     try:
         deactivated = orm_models.Role(
@@ -194,6 +198,3 @@ def sess():
 
 CONFIG = helpers.make_config()
 CONN = _make_conn()
-
-PWD_CONTEXT = CryptContext(schemes=["bcrypt"], deprecated="auto")
-OAUTH2_SCHEME = OAuth2PasswordBearer(tokenUrl="token")
