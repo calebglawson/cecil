@@ -19,7 +19,7 @@ def _exists(directoryname, filename):
     try:
         if not Path(f"./{directoryname}/{filename}.db").exists():
             raise FileNotFoundError
-    except FileExistsError:
+    except FileNotFoundError:
         raise HTTPException(
             status_code=404,
             detail=f'{directoryname[0].upper() + directoryname[1:-1]}: {filename}, does not exist.'
