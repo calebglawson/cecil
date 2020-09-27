@@ -4,9 +4,11 @@ This module routes all watchlist operations.
 
 from os import listdir
 from typing import List
-from fastapi import APIRouter
+from fastapi import APIRouter, BackgroundTasks
+from fastapi.logger import logger
 from baquet.watchlist import Watchlist
 
+from constants import CecilConstants
 import helpers
 import json_models
 
@@ -65,40 +67,87 @@ def get_watchlist_users(
     return watchlist.get_watchlist_users()
 
 
-@ROUTER.post("/{watchlist_id}/import/blockbot/")
-def import_blockbot_list(
+def import_blockbot_list(watchlist: Watchlist, import_details: json_models.ImportBlockbotList):
+    '''
+    Background task specific to importing a blockbot list.
+    '''
+    try:
+        watchlist.import_blockbot_list(
+            import_details.blockbot_id,
+            import_details.name
+        )
+        logger.info(
+            'Successfully imported blockbot list: %s',
+            import_details,
+        )
+    except:
+        logger.error(
+            'Failed to import blockbot list: %s',
+            import_details,
+        )
+        raise
+
+
+@ROUTER.post("/{watchlist_id}/import/blockbot/", status_code=202)
+async def accept_import_blockbot_list(
         watchlist_id: str,
         import_details: json_models.ImportBlockbotList,
+        background_tasks: BackgroundTasks,
 ):
     '''
     Import a blockbot list.
     '''
     watchlist = helpers.wl_getter(watchlist_id)
-    watchlist.import_blockbot_list(
-        import_details.blockbot_id,
-        import_details.name
+    background_tasks.add_task(
+        import_blockbot_list,
+        watchlist,
+        import_details
     )
+    return CecilConstants.MESSAGE_PROCESSING_IN_BACKGROUND
 
 
-@ROUTER.post("/{watchlist_id}/import/twitter/")
-def import_twitter_list(
+def import_twitter_list(watchlist: Watchlist, import_details: json_models.ImportBlockbotList):
+    '''
+    Background task specific to importing a Twitter list.
+    '''
+    if import_details.twitter_id:
+        import_details.slug = None
+        import_details.owner_screen_name = None
+
+    try:
+        watchlist.import_twitter_list(
+            twitter_id=import_details.twitter_id,
+            slug=import_details.slug,
+            owner_screen_name=import_details.owner_screen_name
+        )
+        logger.info(
+            'Successfully imported twitter list: %s',
+            import_details,
+        )
+    except:
+        logger.error(
+            'failed to import twitter list: %s',
+            import_details,
+        )
+        raise
+
+
+@ROUTER.post("/{watchlist_id}/import/twitter/", status_code=202)
+async def accept_import_twitter_list(
         watchlist_id: str,
         import_details: json_models.ImportTwitterList,
+        background_tasks: BackgroundTasks,
 ):
     '''
     Import a twitter list.
     '''
     watchlist = helpers.wl_getter(watchlist_id)
-
-    if import_details.twitter_id:
-        import_details.slug = None
-        import_details.owner_screen_name = None
-
-    watchlist.import_twitter_list(
-        twitter_id=import_details.twitter_id,
-        slug=import_details.slug,
-        owner_screen_name=import_details.owner_screen_name
+    background_tasks.add_task(
+        import_twitter_list,
+        watchlist,
+        import_details
     )
+    return CecilConstants.MESSAGE_PROCESSING_IN_BACKGROUND
 
 
 @ROUTER.get("/{watchlist_id}/sublists/", response_model=List[json_models.Sublist])
@@ -127,16 +176,36 @@ def get_sublist_users(
     return watchlist.get_sublist_users(sublist_id)
 
 
-@ROUTER.post("/{watchlist_id}/sublists/{sublist_id}/refresh/")
-def refresh_sublist(
+def refresh_sublist(watchlist: Watchlist, sublist_id: str):
+    '''
+    Refresh the sublist.
+    '''
+    try:
+        watchlist.refresh_sublist(sublist_id)
+        logger.info(
+            'Successfuly refreshed sublist: %s',
+            sublist_id,
+        )
+    except:
+        logger.error(
+            'Failed to refresh sublist: %s',
+            sublist_id,
+        )
+        raise
+
+
+@ROUTER.post("/{watchlist_id}/sublists/{sublist_id}/refresh/", status_code=202)
+def accept_refresh_sublist(
         watchlist_id: str,
         sublist_id: str,
+        background_tasks: BackgroundTasks,
 ):
     '''
     Refresh a sublist.
     '''
     watchlist = helpers.wl_getter(watchlist_id)
-    watchlist.refresh_sublist(sublist_id)
+    background_tasks.add_task(refresh_sublist, watchlist, sublist_id)
+    return CecilConstants.MESSAGE_PROCESSING_IN_BACKGROUND
 
 
 @ROUTER.delete("/{watchlist_id}/sublists/{sublist_id}")
