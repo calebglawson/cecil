@@ -65,7 +65,7 @@ def get_watchlist_users(
     return watchlist.get_watchlist_users()
 
 
-@ROUTER.post("/{watchlist_id/import/blockbot/")
+@ROUTER.post("/{watchlist_id}/import/blockbot/")
 def import_blockbot_list(
         watchlist_id: str,
         import_details: json_models.ImportBlockbotList,

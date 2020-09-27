@@ -65,7 +65,7 @@ def deactivate_user(user_id: int):
     '''
     with internal_users.sess() as session:
         user = session.query(orm_models.User).filter(
-            orm_models.User.user_id == user_id)
+            orm_models.User.user_id == user_id).first()
         user.role = CecilConstants.DEACTIVATED_ROLE
         session.commit()
 

@@ -174,7 +174,7 @@ def remove_tag_favorite(
 def get_followers(
         user_id: str,
         page: int = 1,
-        page_size: int = 1500,
+        page_size: int = 100,
         watchlist_id: str = None,
 ):
     '''
@@ -192,7 +192,7 @@ def get_followers(
 def get_friends(
         user_id: str,
         page: int = 1,
-        page_size: int = 1500,
+        page_size: int = 100,
         watchlist_id: str = None,
 ):
     '''
