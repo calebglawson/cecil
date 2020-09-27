@@ -15,3 +15,6 @@ class CecilConstants:
     HASHING_ALGORITHM = "HS256"
     WL_PATH = "./watchlists"
     CONFIG_PATH = "./config.json"
+    MESSAGE_PROCESSING_IN_BACKGROUND = {
+        "message": "Processing request in the background"
+    }
