@@ -4,7 +4,8 @@ This module routes all user operations.
 
 from typing import List
 from fastapi import APIRouter
-from baquet.user import User, Directory
+from baquet.user import User
+from baquet.directory import Directory
 
 import json_models
 import helpers
