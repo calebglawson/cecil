@@ -341,12 +341,24 @@ class ExcludeUser(BaseModel):
         orm_mode = True
 
 
+class SublistType(BaseModel):
+    '''
+    Details about a sublist's type.
+    '''
+    sublist_type_id: int
+    name: str = None
+
+    class Config:
+        '''Accept SQLAlchemy objects.'''
+        orm_mode = True
+
+
 class Sublist(BaseModel):
     '''
     Details to view a sublist.
     '''
     sublist_id: int
-    sublist_type_id: int
+    sublist_type: SublistType
     name: str
     external_id: str = None
 

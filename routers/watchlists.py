@@ -54,9 +54,11 @@ def get_watchlist(
     }
 
 
-@ROUTER.get("/{watchlist_id}/users/", response_model=List[json_models.User])
+@ROUTER.get("/{watchlist_id}/users/", response_model=json_models.PaginateUser)
 def get_watchlist_users(
         watchlist_id: str,
+        page: int = 1,
+        page_size: int = 20,
 ):
     '''
     Get users on the watchlist.
@@ -64,7 +66,7 @@ def get_watchlist_users(
     watchlist = helpers.wl_getter(watchlist_id)
     watchlist.refresh_watchlist_user_data()
 
-    return watchlist.get_watchlist_users()
+    return watchlist.get_watchlist_users(page=page, page_size=page_size)
 
 
 def import_blockbot_list(watchlist: Watchlist, import_details: json_models.ImportBlockbotList):
@@ -163,17 +165,19 @@ def get_sublists(
 
 @ROUTER.get(
     "/{watchlist_id}/sublists/{sublist_id}/users/",
-    response_model=List[json_models.User]
+    response_model=json_models.PaginateUser
 )
 def get_sublist_users(
         watchlist_id: str,
         sublist_id: str,
+        page: int = 1,
+        page_size: int = 20,
 ):
     '''
     Get the users in the sublist.
     '''
     watchlist = helpers.wl_getter(watchlist_id)
-    return watchlist.get_sublist_users(sublist_id)
+    return watchlist.get_sublist_users(sublist_id, page=page, page_size=page_size)
 
 
 def refresh_sublist(watchlist: Watchlist, sublist_id: str):
